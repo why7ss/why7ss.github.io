@@ -1285,3 +1285,130 @@ body {
     border-color: rgba(0, 245, 255, 0.2);
     background: var(--bg-medium);
 }
+
+/* ============================================
+   CODE BLOCK - ИСПРАВЛЕННЫЕ СТИЛИ
+   ============================================ */
+
+.code-container {
+    margin: 20px 0;
+    background: #0d1117;
+    border: 1px solid rgba(0, 245, 255, 0.3);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(0, 245, 255, 0.1);
+    border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+}
+
+.code-filename {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    color: var(--primary);
+}
+
+.code-lang {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.code-block {
+    padding: 15px 0;
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    overflow-x: auto;
+}
+
+.code-line {
+    display: flex;
+    padding: 2px 20px;
+}
+
+.code-line.error-line {
+    background: rgba(255, 51, 102, 0.15);
+    border-left: 3px solid var(--error);
+    padding-left: 17px;
+}
+
+.line-num {
+    width: 30px;
+    color: #6e7681;
+    text-align: right;
+    padding-right: 20px;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.line-content {
+    color: #e6edf3;
+    white-space: pre;
+}
+
+/* YAML Syntax Highlighting */
+.hl-comment { color: #8b949e; font-style: italic; }
+.hl-key { color: #79c0ff; }
+.hl-colon { color: #e6edf3; }
+.hl-string { color: #a5d6ff; }
+.hl-bool { color: #ff7b72; }
+.hl-number { color: #d2a8ff; }
+.hl-dash { color: #ff7b72; font-weight: bold; }
+
+/* Answer Result */
+.answer-result {
+    margin-top: 15px;
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+    font-size: 1.1rem;
+}
+
+.answer-result.correct {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--success);
+    color: var(--success);
+}
+
+.answer-result.wrong {
+    background: rgba(255, 51, 102, 0.1);
+    border: 1px solid var(--error);
+    color: var(--error);
+}
+
+.answer-result .result-icon {
+    font-size: 1.3rem;
+    margin-right: 8px;
+}
+
+.answer-result .correct-answer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.answer-result .correct-answer code {
+    display: block;
+    margin-top: 8px;
+    color: var(--success);
+    font-family: 'Fira Code', monospace;
+    font-size: 1rem;
+}
+
+/* Option locked state */
+.option-btn.locked {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.option-btn.locked:not(.correct):not(.wrong) {
+    opacity: 0.5;
+}

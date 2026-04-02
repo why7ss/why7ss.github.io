@@ -2,9 +2,14 @@
 // MINECRAFT STAFF TEST - MAIN APPLICATION
 // ============================================
 
-// Configuration
+// Configuration - ДВА ВЕБХУКА
 const CONFIG = {
-    webhookURL: 'https://discord.com/api/webhooks/1489390914672529459/st-SOKXZ85hQaTQ7reICAMQgB-uR08kXgFaL6d7z6CAVLMZIYZ271IHfbnctXga_NWO7',
+    // Основной канал - итоговые результаты
+    webhookResults: 'https://discord.com/api/webhooks/ТВОЙ_ОСНОВНОЙ_ВЕБХУК',
+    
+    // Лог-канал - выходы, рестарты, подозрительная активность  
+    webhookLogs: 'https://discord.com/api/webhooks/ТВОЙ_ЛОГ_ВЕБХУК',
+    
     ipAPIURL: 'https://api.ipify.org?format=json',
     storageKey: 'mcStaffTest_session'
 };
@@ -31,7 +36,6 @@ const QUESTIONS = [
         id: 3,
         type: 'text',
         question: 'Напишите команду для выдачи группы "sponsor" игроку "uuun" через LuckPerms:',
-        // Несколько правильных вариантов
         correctVariants: [
             'lp user uuun parent add sponsor',
             'lp user uuun parent set sponsor',
@@ -66,18 +70,19 @@ const QUESTIONS = [
     {
         id: 6,
         type: 'code',
-        question: 'Найдите и исправьте ошибку в конфигурации (строка 5). Что нужно добавить?',
-        code: `settings:
-  prefix: "&6[Server] "
-  messages:
-    welcome: "&aДобро пожаловать, %player%!
-    goodbye: "&cДо свидания, %player%!"
-  enabled: true`,
+        question: 'Найдите ошибку в конфиге (строка 4). Что нужно исправить?',
+        codeLines: [
+            { num: 1, text: 'settings:', type: 'normal' },
+            { num: 2, text: '  prefix: "&6[Server] "', type: 'normal' },
+            { num: 3, text: '  messages:', type: 'normal' },
+            { num: 4, text: '    welcome: "&aДобро пожаловать, %player%!', type: 'error' },
+            { num: 5, text: '    goodbye: "&cДо свидания, %player%!"', type: 'normal' },
+            { num: 6, text: '  enabled: true', type: 'normal' }
+        ],
         errorLine: 4,
-        // Проверяем ключевые элементы
-        checkKeywords: ['"', 'welcome', '%player%'],
-        displayCorrect: 'Закрыть кавычку в конце строки welcome',
-        hint: 'Обратите внимание на кавычки',
+        checkKeywords: ['кавычк', 'закрыть', '"', 'quote', 'закрыта'],
+        displayCorrect: 'Не закрыта кавычка в конце строки',
+        hint: 'Посмотрите на кавычки в строке',
         category: 'Конфигурация'
     },
     {
@@ -96,11 +101,9 @@ const QUESTIONS = [
             'tempban griefer 7d гриферство',
             'tempban griefer 7d griefing',
             'tempban griefer 7days гриферство',
-            'tempban griefer 7days griefing',
             'ban griefer 7d гриферство',
             'ban griefer 7d griefing',
-            'tban griefer 7d гриферство',
-            'tban griefer 7d griefing'
+            'tban griefer 7d гриферство'
         ],
         displayCorrect: 'tempban griefer 7d Гриферство',
         hint: 'Команда временного бана с указанием времени',
@@ -109,21 +112,23 @@ const QUESTIONS = [
     {
         id: 9,
         type: 'code',
-        question: 'Исправьте ошибку в YAML конфиге (строка 7). В чём проблема?',
-        code: `groups:
-  default:
-    permissions:
-      - essentials.help
-      - essentials.spawn
-  vip:
-     - essentials.fly
-      - essentials.heal
-    inheritance:
-      - default`,
+        question: 'Найдите ошибку в YAML конфиге (строка 7). В чём проблема?',
+        codeLines: [
+            { num: 1, text: 'groups:', type: 'normal' },
+            { num: 2, text: '  default:', type: 'normal' },
+            { num: 3, text: '    permissions:', type: 'normal' },
+            { num: 4, text: '      - essentials.help', type: 'normal' },
+            { num: 5, text: '      - essentials.spawn', type: 'normal' },
+            { num: 6, text: '  vip:', type: 'normal' },
+            { num: 7, text: '     - essentials.fly', type: 'error' },
+            { num: 8, text: '      - essentials.heal', type: 'normal' },
+            { num: 9, text: '    inheritance:', type: 'normal' },
+            { num: 10, text: '      - default', type: 'normal' }
+        ],
         errorLine: 7,
-        checkKeywords: ['отступ', 'пробел', 'выравнивание', 'indent', 'space'],
-        displayCorrect: 'Неправильный отступ (лишний пробел)',
-        hint: 'Проверьте выравнивание строк',
+        checkKeywords: ['отступ', 'пробел', 'space', 'indent', '5', 'лишний', 'неправильн'],
+        displayCorrect: 'Неправильный отступ (5 пробелов вместо 6)',
+        hint: 'Проверьте количество пробелов',
         category: 'Конфигурация'
     },
     {
@@ -190,7 +195,10 @@ function init() {
     elements.totalQuestionsEl.textContent = QUESTIONS.length;
 }
 
-// Check if user already started/completed test
+// ============================================
+// SESSION MANAGEMENT
+// ============================================
+
 function checkExistingSession() {
     const savedSession = localStorage.getItem(CONFIG.storageKey);
     
@@ -201,7 +209,6 @@ function checkExistingSession() {
             const maxAge = 24 * 60 * 60 * 1000; // 24 часа
             
             if (sessionAge < maxAge) {
-                // Сессия ещё активна - показываем предупреждение
                 state.sessionId = session.id;
                 
                 if (session.completed) {
@@ -214,7 +221,6 @@ function checkExistingSession() {
                     return;
                 }
             } else {
-                // Сессия устарела - очищаем
                 localStorage.removeItem(CONFIG.storageKey);
             }
         } catch (e) {
@@ -222,7 +228,6 @@ function checkExistingSession() {
         }
     }
     
-    // Создаём новую сессию
     state.sessionId = generateSessionId();
 }
 
@@ -272,12 +277,12 @@ function showResumeWarning(session) {
             <div style="font-size: 3rem; margin-bottom: 15px;">🚫</div>
             <h3 style="color: var(--error); margin-bottom: 15px; font-family: 'Orbitron', sans-serif;">Обнаружена попытка перезапуска</h3>
             <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                Вы уже начали тест и дошли до вопроса ${questionNum}.<br>
-                Перезагрузка страницы была зафиксирована.
+                Вы начали тест и дошли до вопроса <strong>${questionNum}</strong>.<br>
+                Перезагрузка страницы зафиксирована.
             </p>
-            <div style="background: rgba(255, 51, 102, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="background: rgba(255, 51, 102, 0.1); padding: 15px; border-radius: 10px;">
                 <p style="color: var(--error); font-size: 0.9rem;">
-                    📊 Эта информация отправлена администрации
+                    📊 Информация отправлена администрации
                 </p>
             </div>
         </div>
@@ -288,76 +293,34 @@ function showResumeWarning(session) {
         </button>
     `;
     
-    // Отправляем уведомление о попытке рестарта
     sendRestartNotification(session);
 }
 
+// Отправка в ЛОГ-канал о попытке рестарта
 async function sendRestartNotification(session) {
     const embed = {
-        title: '⚠️ Попытка перезапуска теста',
+        title: '🔄 Попытка перезапуска теста',
         color: 0xff3366,
         fields: [
-            {
-                name: '👤 Discord',
-                value: `\`${session.discordName || 'Не указан'}\``,
-                inline: true
-            },
-            {
-                name: '🎮 Minecraft',
-                value: `\`${session.minecraftName || 'Не указан'}\``,
-                inline: true
-            },
-            {
-                name: '🌐 IP',
-                value: `\`${state.userIP}\``,
-                inline: true
-            },
-            {
-                name: '📍 Остановился на',
-                value: `Вопрос ${session.currentQuestion + 1} из ${QUESTIONS.length}`,
-                inline: true
-            },
-            {
-                name: '✅ Правильных до рестарта',
-                value: `${session.correctCount || 0}`,
-                inline: true
-            },
-            {
-                name: '👀 Уходов со вкладки',
-                value: `${session.tabAwayCount || 0}`,
-                inline: true
-            }
+            { name: '👤 Discord', value: `\`${session.discordName || 'Не указан'}\``, inline: true },
+            { name: '🎮 Minecraft', value: `\`${session.minecraftName || 'Не указан'}\``, inline: true },
+            { name: '🌐 IP', value: `\`${state.userIP}\``, inline: true },
+            { name: '📍 Остановился на', value: `Вопрос ${session.currentQuestion + 1}/${QUESTIONS.length}`, inline: true },
+            { name: '✅ Правильных до рестарта', value: `${session.correctCount || 0}`, inline: true },
+            { name: '👀 Уходов со вкладки', value: `${session.tabAwayCount || 0}`, inline: true }
         ],
-        footer: {
-            text: 'Пользователь пытался перезапустить тест'
-        },
         timestamp: new Date().toISOString()
     };
     
-    try {
-        await fetch(CONFIG.webhookURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: 'Staff Test Bot',
-                avatar_url: 'https://i.imgur.com/oBPXx0D.png',
-                embeds: [embed]
-            })
-        });
-    } catch (error) {
-        console.error('Failed to send restart notification:', error);
-    }
+    await sendToWebhook(CONFIG.webhookLogs, embed);
 }
 
 function forceRestart() {
     localStorage.removeItem(CONFIG.storageKey);
     location.reload();
 }
-
-// Make it global for onclick
 window.forceRestart = forceRestart;
 
-// Save session state
 function saveSession() {
     const session = {
         id: state.sessionId,
@@ -400,12 +363,8 @@ function createParticles() {
 // ============================================
 
 function setupEventListeners() {
-    // Start Button
-    elements.startBtn.addEventListener('click', () => {
-        showScreen('register');
-    });
+    elements.startBtn.addEventListener('click', () => showScreen('register'));
 
-    // Register Form
     elements.registerForm.addEventListener('submit', (e) => {
         e.preventDefault();
         state.discordName = elements.discordInput.value.trim();
@@ -413,23 +372,18 @@ function setupEventListeners() {
         startQuiz();
     });
 
-    // Next Button
     elements.nextBtn.addEventListener('click', nextQuestion);
 
-    // Tab Visibility
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Page unload - send partial results
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // Copy Protection
+    // Copy protection
     document.addEventListener('copy', preventCopy);
     document.addEventListener('cut', preventCopy);
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     
-    // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 'x' || e.key === 'X' || e.key === 'u' || e.key === 'U')) {
+        if (e.ctrlKey && ['c', 'C', 'x', 'X', 'u', 'U'].includes(e.key)) {
             e.preventDefault();
             showCopyWarning();
         }
@@ -439,17 +393,15 @@ function setupEventListeners() {
 function handleBeforeUnload(e) {
     if (state.currentScreen === 'quiz' && !state.isCompleted) {
         saveSession();
-        
-        // Отправляем частичные результаты
-        sendPartialResults();
-        
+        sendLeaveNotification();
         e.preventDefault();
-        e.returnValue = 'Вы уверены, что хотите покинуть тест? Прогресс будет потерян.';
+        e.returnValue = 'Вы уверены? Прогресс будет потерян.';
         return e.returnValue;
     }
 }
 
-async function sendPartialResults() {
+// Отправка в ЛОГ-канал о выходе
+async function sendLeaveNotification() {
     if (state.answers.length === 0) return;
     
     const correctCount = state.answers.filter(a => a.isCorrect).length;
@@ -457,55 +409,26 @@ async function sendPartialResults() {
     const embed = {
         title: '🚪 Пользователь покинул тест',
         color: 0xffaa00,
-        thumbnail: {
-            url: `https://mc-heads.net/avatar/${state.minecraftName}/128`
-        },
+        thumbnail: { url: `https://mc-heads.net/avatar/${state.minecraftName}/128` },
         fields: [
-            {
-                name: '👤 Discord',
-                value: `\`${state.discordName}\``,
-                inline: true
-            },
-            {
-                name: '🎮 Minecraft',
-                value: `\`${state.minecraftName}\``,
-                inline: true
-            },
-            {
-                name: '🌐 IP',
-                value: `\`${state.userIP}\``,
-                inline: true
-            },
-            {
-                name: '📍 Остановился на',
-                value: `Вопрос ${state.currentQuestion + 1} из ${QUESTIONS.length}`,
-                inline: true
-            },
-            {
-                name: '✅ Правильных',
-                value: `${correctCount}/${state.answers.length}`,
-                inline: true
-            },
-            {
-                name: '👀 Уходов со вкладки',
-                value: `${state.tabAwayCount} (${state.tabAwayTime.toFixed(1)} сек)`,
-                inline: true
-            }
+            { name: '👤 Discord', value: `\`${state.discordName}\``, inline: true },
+            { name: '🎮 Minecraft', value: `\`${state.minecraftName}\``, inline: true },
+            { name: '🌐 IP', value: `\`${state.userIP}\``, inline: true },
+            { name: '📍 Остановился на', value: `Вопрос ${state.currentQuestion + 1}/${QUESTIONS.length}`, inline: true },
+            { name: '✅ Правильных', value: `${correctCount}/${state.answers.length}`, inline: true },
+            { name: '👀 Уходов', value: `${state.tabAwayCount} (${state.tabAwayTime.toFixed(1)}с)`, inline: true }
         ],
-        footer: {
-            text: 'Тест не был завершён'
-        },
         timestamp: new Date().toISOString()
     };
     
-    // Используем sendBeacon для надёжной отправки при закрытии
+    // sendBeacon для надёжной отправки при закрытии
     const data = JSON.stringify({
         username: 'Staff Test Bot',
         avatar_url: 'https://i.imgur.com/oBPXx0D.png',
         embeds: [embed]
     });
     
-    navigator.sendBeacon(CONFIG.webhookURL, new Blob([data], { type: 'application/json' }));
+    navigator.sendBeacon(CONFIG.webhookLogs, new Blob([data], { type: 'application/json' }));
 }
 
 // ============================================
@@ -513,18 +436,16 @@ async function sendPartialResults() {
 // ============================================
 
 function showScreen(screenName) {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     
-    const screenMap = {
+    const screens = {
         'welcome': elements.welcomeScreen,
         'register': elements.registerScreen,
         'quiz': elements.quizScreen,
         'results': elements.resultsScreen
     };
     
-    screenMap[screenName].classList.add('active');
+    screens[screenName].classList.add('active');
     state.currentScreen = screenName;
 }
 
@@ -556,7 +477,6 @@ function startQuiz() {
     state.selectedOption = null;
     
     saveSession();
-    
     showScreen('quiz');
     renderQuestion();
     startTimer();
@@ -573,9 +493,7 @@ function renderQuestion() {
     elements.progressFill.style.width = progress + '%';
     elements.progressPercent.textContent = Math.round(progress) + '%';
     
-    // Disable next button
     elements.nextBtn.disabled = true;
-    elements.nextBtn.textContent = 'Далее';
     
     let html = `
         <div class="question-number">
@@ -599,7 +517,6 @@ function renderQuestion() {
     
     elements.questionContainer.innerHTML = html;
     
-    // Add event listeners based on question type
     if (question.type === 'choice') {
         setupChoiceListeners();
     } else {
@@ -628,8 +545,6 @@ function renderChoiceQuestion(question) {
     });
     
     html += '</div>';
-    
-    // Кнопка подтверждения
     html += `
         <div class="confirm-container" style="margin-top: 25px; text-align: center;">
             <button class="neon-button primary" id="confirm-choice-btn" disabled>
@@ -649,16 +564,9 @@ function setupChoiceListeners() {
         btn.addEventListener('click', function() {
             if (this.classList.contains('locked')) return;
             
-            // Снимаем выделение со всех
-            document.querySelectorAll('.option-btn').forEach(b => {
-                b.classList.remove('selected');
-            });
-            
-            // Выделяем выбранный
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
             this.classList.add('selected');
             state.selectedOption = parseInt(this.dataset.index);
-            
-            // Активируем кнопку подтверждения
             confirmBtn.disabled = false;
         });
     });
@@ -669,30 +577,22 @@ function setupChoiceListeners() {
         const question = QUESTIONS[state.currentQuestion];
         const isCorrect = state.selectedOption === question.correct;
         
-        // Блокируем все кнопки
-        document.querySelectorAll('.option-btn').forEach(b => {
-            b.classList.add('locked');
-        });
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.add('locked'));
         confirmBtn.disabled = true;
-        confirmBtn.innerHTML = '<span class="btn-content">Ответ принят</span>';
+        confirmBtn.innerHTML = '<span class="btn-content">✓ Ответ принят</span>';
         
-        // Показываем результат
         const selectedBtn = document.querySelector(`.option-btn[data-index="${state.selectedOption}"]`);
         selectedBtn.classList.remove('selected');
         selectedBtn.classList.add(isCorrect ? 'correct' : 'wrong');
         selectedBtn.querySelector('.option-icon').textContent = isCorrect ? '✓' : '✗';
         
-        // Показываем правильный ответ если ошибся
         if (!isCorrect) {
             const correctBtn = document.querySelector(`.option-btn[data-index="${question.correct}"]`);
             correctBtn.classList.add('correct');
             correctBtn.querySelector('.option-icon').textContent = '✓';
         }
         
-        // Записываем ответ
         recordAnswer(question.options[state.selectedOption], isCorrect);
-        
-        // Активируем кнопку далее
         elements.nextBtn.disabled = false;
     });
 }
@@ -710,7 +610,7 @@ function renderTextQuestion(question) {
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">
                 💡 ${question.hint}
             </p>
-            <button class="neon-button primary submit-answer-btn" id="submit-text-btn" disabled>
+            <button class="neon-button primary submit-answer-btn" id="submit-text-btn" disabled style="margin-top: 15px;">
                 <span class="btn-content">Ответить</span>
                 <div class="btn-glow"></div>
             </button>
@@ -718,105 +618,22 @@ function renderTextQuestion(question) {
     `;
 }
 
-function setupInputListeners() {
-    const submitBtn = document.getElementById('submit-text-btn');
-    const input = document.getElementById('text-answer');
-    
-    // Активируем кнопку когда есть текст
-    input.addEventListener('input', () => {
-        submitBtn.disabled = input.value.trim().length === 0;
-    });
-    
-    submitBtn.addEventListener('click', () => {
-        const answer = input.value.trim();
-        if (!answer) return;
-        
-        const question = QUESTIONS[state.currentQuestion];
-        const isCorrect = checkTextAnswer(answer, question);
-        
-        // Record answer
-        recordAnswer(answer, isCorrect);
-        
-        // Visual feedback
-        input.classList.add(isCorrect ? 'correct' : 'wrong');
-        input.disabled = true;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="btn-content">Ответ принят</span>';
-        
-        // Show result message
-        const resultDiv = document.createElement('div');
-        resultDiv.style.cssText = `
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: var(--border-radius);
-        `;
-        
-        if (isCorrect) {
-            resultDiv.style.background = 'rgba(0, 255, 136, 0.1)';
-            resultDiv.style.border = '1px solid var(--success)';
-            resultDiv.innerHTML = `<span style="color: var(--success); font-size: 1.2rem;">✓ Правильно!</span>`;
-        } else {
-            resultDiv.style.background = 'rgba(255, 51, 102, 0.1)';
-            resultDiv.style.border = '1px solid var(--error)';
-            resultDiv.innerHTML = `
-                <span style="color: var(--error); font-size: 1.2rem;">✗ Неправильно</span>
-                <br><br>
-                <strong style="color: var(--text-secondary);">Правильный ответ:</strong><br>
-                <code style="color: var(--success); font-size: 1.1rem;">${question.displayCorrect}</code>
-            `;
-        }
-        
-        input.parentNode.appendChild(resultDiv);
-        elements.nextBtn.disabled = false;
-    });
-    
-    // Allow Enter to submit
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !submitBtn.disabled) {
-            submitBtn.click();
-        }
-    });
-}
-
-function checkTextAnswer(answer, question) {
-    const normalizedAnswer = normalizeCommand(answer);
-    
-    if (question.correctVariants) {
-        return question.correctVariants.some(variant => 
-            normalizeCommand(variant) === normalizedAnswer
-        );
-    }
-    
-    return false;
-}
-
-function normalizeCommand(str) {
-    return str
-        .toLowerCase()
-        .trim()
-        .replace(/^\/+/, '')  // Убираем слеши в начале
-        .replace(/\s+/g, ' '); // Нормализуем пробелы
-}
-
 // ============================================
-// CODE QUESTIONS
+// CODE QUESTIONS - ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ============================================
 
 function renderCodeQuestion(question) {
-    const lines = question.code.split('\n');
     let codeHtml = '';
     
-    lines.forEach((line, index) => {
-        const lineNum = index + 1;
-        const isError = lineNum === question.errorLine;
-        const escapedLine = escapeHtml(line);
-        const highlightedLine = highlightYamlSyntax(escapedLine);
+    // Используем новый формат codeLines
+    question.codeLines.forEach(line => {
+        const lineClass = line.type === 'error' ? 'code-line error-line' : 'code-line';
+        // Безопасное отображение текста
+        const safeText = escapeHtml(line.text);
+        // Подсветка после экранирования
+        const highlighted = highlightYaml(safeText);
         
-        if (isError) {
-            codeHtml += `<div class="error-line"><span class="line-number">${lineNum}</span>${highlightedLine}</div>`;
-        } else {
-            codeHtml += `<div><span class="line-number">${lineNum}</span>${highlightedLine}</div>`;
-        }
+        codeHtml += `<div class="${lineClass}"><span class="line-num">${line.num}</span><span class="line-content">${highlighted}</span></div>`;
     });
     
     return `
@@ -825,18 +642,17 @@ function renderCodeQuestion(question) {
                 <span class="code-filename">📄 config.yml</span>
                 <span class="code-lang">YAML</span>
             </div>
-            <div class="code-block">
-                <pre>${codeHtml}</pre>
-            </div>
+            <div class="code-block">${codeHtml}</div>
         </div>
         <div class="text-input-container">
             <label class="text-input-label">Опишите ошибку или напишите исправление:</label>
             <input type="text" class="text-input neon-input" id="text-answer" 
-                   placeholder="Например: закрыть кавычку, исправить отступ..." autocomplete="off" spellcheck="false">
+                   placeholder="Например: закрыть кавычку, убрать лишний пробел..." 
+                   autocomplete="off" spellcheck="false">
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">
                 💡 ${question.hint}
             </p>
-            <button class="neon-button primary submit-answer-btn" id="submit-text-btn" disabled>
+            <button class="neon-button primary submit-answer-btn" id="submit-text-btn" disabled style="margin-top: 15px;">
                 <span class="btn-content">Ответить</span>
                 <div class="btn-glow"></div>
             </button>
@@ -844,65 +660,55 @@ function renderCodeQuestion(question) {
     `;
 }
 
+// Безопасное экранирование HTML
 function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
 }
 
-function highlightYamlSyntax(line) {
-    // Комментарии
-    if (line.trim().startsWith('#')) {
-        return `<span class="yaml-comment">${line}</span>`;
+// Подсветка YAML ПОСЛЕ экранирования
+function highlightYaml(text) {
+    // Комментарии (# в начале после пробелов)
+    if (/^\s*#/.test(text)) {
+        return `<span class="hl-comment">${text}</span>`;
     }
     
-    // Ключ: значение
-    let result = line;
+    let result = text;
     
-    // Подсветка ключей (слово перед двоеточием)
-    result = result.replace(/^(\s*)([a-zA-Z_-]+)(:)/g, '$1<span class="yaml-key">$2</span>$3');
+    // Ключи (слово: ) - НЕ ВНУТРИ СТРОК
+    result = result.replace(/^(\s*)([a-zA-Z_][a-zA-Z0-9_-]*)(:)/, 
+        '$1<span class="hl-key">$2</span><span class="hl-colon">$3</span>');
     
-    // Подсветка строк в кавычках
-    result = result.replace(/"([^"]*)"/g, '<span class="yaml-string">"$1"</span>');
-    result = result.replace(/'([^']*)'/g, "<span class=\"yaml-string\">'$1'</span>");
+    // Строки в кавычках (уже экранированы как &quot;)
+    result = result.replace(/(&quot;[^&]*&quot;)/g, '<span class="hl-string">$1</span>');
     
-    // Подсветка булевых значений
-    result = result.replace(/:\s*(true|false)(\s*)$/gi, ': <span class="yaml-bool">$1</span>$2');
+    // Булевые значения
+    result = result.replace(/:\s*(true|false)(\s*)$/gi, ': <span class="hl-bool">$1</span>$2');
     
-    // Подсветка чисел
-    result = result.replace(/:\s*(\d+)(\s*)$/g, ': <span class="yaml-number">$1</span>$2');
+    // Числа
+    result = result.replace(/:\s*(\d+)(\s*)$/g, ': <span class="hl-number">$1</span>$2');
     
-    // Подсветка списков
-    result = result.replace(/^(\s*)(-)(\s+)/g, '$1<span class="yaml-dash">$2</span>$3');
+    // Списки (-)
+    result = result.replace(/^(\s*)(-)(\s)/, '$1<span class="hl-dash">$2</span>$3');
     
     return result;
 }
 
-// Проверка ответа на код-вопрос
-function checkCodeAnswer(answer, question) {
-    const lowerAnswer = answer.toLowerCase();
-    
-    // Проверяем, содержит ли ответ ключевые слова
-    if (question.checkKeywords) {
-        const matchCount = question.checkKeywords.filter(keyword => 
-            lowerAnswer.includes(keyword.toLowerCase())
-        ).length;
-        
-        // Достаточно упомянуть хотя бы одно ключевое слово
-        return matchCount >= 1;
-    }
-    
-    return false;
-}
+// ============================================
+// INPUT LISTENERS (text & code)
+// ============================================
 
-// Модифицируем setupInputListeners для code вопросов
-const originalSetupInputListeners = setupInputListeners;
-setupInputListeners = function() {
+function setupInputListeners() {
     const submitBtn = document.getElementById('submit-text-btn');
     const input = document.getElementById('text-answer');
     const question = QUESTIONS[state.currentQuestion];
     
-    // Активируем кнопку когда есть текст
     input.addEventListener('input', () => {
         submitBtn.disabled = input.value.trim().length === 0;
     });
@@ -912,56 +718,74 @@ setupInputListeners = function() {
         if (!answer) return;
         
         let isCorrect;
-        
         if (question.type === 'code') {
             isCorrect = checkCodeAnswer(answer, question);
         } else {
             isCorrect = checkTextAnswer(answer, question);
         }
         
-        // Record answer
         recordAnswer(answer, isCorrect);
         
-        // Visual feedback
         input.classList.add(isCorrect ? 'correct' : 'wrong');
         input.disabled = true;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="btn-content">Ответ принят</span>';
+        submitBtn.innerHTML = '<span class="btn-content">✓ Ответ принят</span>';
         
-        // Show result message
-        const resultDiv = document.createElement('div');
-        resultDiv.style.cssText = `
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: var(--border-radius);
-        `;
-        
-        if (isCorrect) {
-            resultDiv.style.background = 'rgba(0, 255, 136, 0.1)';
-            resultDiv.style.border = '1px solid var(--success)';
-            resultDiv.innerHTML = `<span style="color: var(--success); font-size: 1.2rem;">✓ Правильно!</span>`;
-        } else {
-            resultDiv.style.background = 'rgba(255, 51, 102, 0.1)';
-            resultDiv.style.border = '1px solid var(--error)';
-            resultDiv.innerHTML = `
-                <span style="color: var(--error); font-size: 1.2rem;">✗ Неправильно</span>
-                <br><br>
-                <strong style="color: var(--text-secondary);">Правильный ответ:</strong><br>
-                <code style="color: var(--success); font-size: 1.1rem;">${question.displayCorrect}</code>
-            `;
-        }
-        
-        input.parentNode.appendChild(resultDiv);
+        showAnswerResult(input, isCorrect, question.displayCorrect);
         elements.nextBtn.disabled = false;
     });
     
-    // Allow Enter to submit
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !submitBtn.disabled) {
             submitBtn.click();
         }
     });
-};
+}
+
+function showAnswerResult(input, isCorrect, correctAnswer) {
+    const resultDiv = document.createElement('div');
+    resultDiv.className = 'answer-result ' + (isCorrect ? 'correct' : 'wrong');
+    
+    if (isCorrect) {
+        resultDiv.innerHTML = `<span class="result-icon">✓</span> Правильно!`;
+    } else {
+        resultDiv.innerHTML = `
+            <span class="result-icon">✗</span> Неправильно
+            <div class="correct-answer">
+                <strong>Правильный ответ:</strong><br>
+                <code>${correctAnswer}</code>
+            </div>
+        `;
+    }
+    
+    input.parentNode.appendChild(resultDiv);
+}
+
+function checkTextAnswer(answer, question) {
+    const normalized = normalizeCommand(answer);
+    
+    if (question.correctVariants) {
+        return question.correctVariants.some(v => normalizeCommand(v) === normalized);
+    }
+    return false;
+}
+
+function checkCodeAnswer(answer, question) {
+    const lower = answer.toLowerCase();
+    
+    if (question.checkKeywords) {
+        return question.checkKeywords.some(kw => lower.includes(kw.toLowerCase()));
+    }
+    return false;
+}
+
+function normalizeCommand(str) {
+    return str
+        .toLowerCase()
+        .trim()
+        .replace(/^\/+/, '')
+        .replace(/\s+/g, ' ');
+}
 
 // ============================================
 // ANSWER RECORDING
@@ -975,7 +799,8 @@ function recordAnswer(answer, isCorrect) {
         questionId: question.id,
         question: question.question,
         answer: answer,
-        correctAnswer: question.displayCorrect || (typeof question.correct === 'number' ? question.options[question.correct] : question.correct),
+        correctAnswer: question.displayCorrect || 
+            (typeof question.correct === 'number' ? question.options[question.correct] : question.correct),
         isCorrect: isCorrect,
         timeSpent: timeSpent
     });
@@ -1004,7 +829,7 @@ function finishQuiz() {
     
     showScreen('results');
     calculateResults();
-    sendToDiscord();
+    sendFinalResults();
 }
 
 // ============================================
@@ -1017,7 +842,6 @@ function calculateResults() {
     const avgTime = state.questionTimes.reduce((a, b) => a + b, 0) / state.questionTimes.length;
     const percent = (correctCount / QUESTIONS.length) * 100;
     
-    // Update UI
     document.getElementById('score-value').textContent = correctCount;
     document.getElementById('correct-count').textContent = correctCount;
     document.getElementById('wrong-count').textContent = wrongCount;
@@ -1030,10 +854,10 @@ function calculateResults() {
     
     setTimeout(() => {
         const ring = document.getElementById('score-ring-fill');
-        ring.style.strokeDashoffset = offset;
+        if (ring) ring.style.strokeDashoffset = offset;
     }, 300);
     
-    // Add gradient definition to SVG
+    // Add gradient
     const svg = document.querySelector('.score-ring');
     if (svg && !svg.querySelector('defs')) {
         const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -1047,23 +871,19 @@ function calculateResults() {
     }
     
     // Results message
-    let message, icon, title;
+    let icon, title, message;
     if (percent >= 80) {
-        icon = '🎉';
-        title = 'Отличный результат!';
-        message = 'Вы отлично знаете материал! Ожидайте ответа от администрации.';
+        icon = '🎉'; title = 'Отличный результат!';
+        message = 'Вы отлично знаете материал! Ожидайте ответа.';
     } else if (percent >= 60) {
-        icon = '👍';
-        title = 'Хороший результат!';
-        message = 'Неплохие знания, но есть над чем поработать.';
+        icon = '👍'; title = 'Хороший результат!';
+        message = 'Неплохо, но есть над чем поработать.';
     } else if (percent >= 40) {
-        icon = '📚';
-        title = 'Нужно подучить';
-        message = 'Рекомендуем изучить документацию и попробовать снова.';
+        icon = '📚'; title = 'Нужно подучить';
+        message = 'Рекомендуем изучить документацию.';
     } else {
-        icon = '💪';
-        title = 'Не сдавайтесь!';
-        message = 'Изучите материалы по администрированию серверов и попробуйте снова.';
+        icon = '💪'; title = 'Не сдавайтесь!';
+        message = 'Изучите материалы и попробуйте снова.';
     }
     
     document.getElementById('results-icon').textContent = icon;
@@ -1104,16 +924,37 @@ function handleVisibilityChange() {
         state.tabAwayStart = Date.now();
         state.tabAwayCount++;
         elements.tabWarning.classList.add('active');
+        
+        // Отправляем уведомление в лог
+        sendTabAwayNotification();
         saveSession();
     } else {
         state.isTabActive = true;
         if (state.tabAwayStart) {
-            state.tabAwayTime += (Date.now() - state.tabAwayStart) / 1000;
+            const awayTime = (Date.now() - state.tabAwayStart) / 1000;
+            state.tabAwayTime += awayTime;
             state.tabAwayStart = null;
         }
         elements.tabWarning.classList.remove('active');
         saveSession();
     }
+}
+
+// Отправка в ЛОГ-канал об уходе со вкладки
+async function sendTabAwayNotification() {
+    const embed = {
+        title: '👀 Уход со вкладки',
+        color: 0xffaa00,
+        fields: [
+            { name: '👤 Discord', value: `\`${state.discordName}\``, inline: true },
+            { name: '🎮 Minecraft', value: `\`${state.minecraftName}\``, inline: true },
+            { name: '📍 Вопрос', value: `${state.currentQuestion + 1}/${QUESTIONS.length}`, inline: true },
+            { name: '🔢 Раз ушёл', value: `${state.tabAwayCount}`, inline: true }
+        ],
+        timestamp: new Date().toISOString()
+    };
+    
+    await sendToWebhook(CONFIG.webhookLogs, embed);
 }
 
 // ============================================
@@ -1127,16 +968,31 @@ function preventCopy(e) {
 
 function showCopyWarning() {
     elements.copyProtection.classList.add('show');
-    setTimeout(() => {
-        elements.copyProtection.classList.remove('show');
-    }, 2000);
+    setTimeout(() => elements.copyProtection.classList.remove('show'), 2000);
 }
 
 // ============================================
-// SEND TO DISCORD
+// WEBHOOK HELPERS
 // ============================================
 
-async function sendToDiscord() {
+async function sendToWebhook(url, embed) {
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'Staff Test Bot',
+                avatar_url: 'https://i.imgur.com/oBPXx0D.png',
+                embeds: [embed]
+            })
+        });
+    } catch (error) {
+        console.error('Webhook error:', error);
+    }
+}
+
+// Итоговые результаты в ОСНОВНОЙ канал
+async function sendFinalResults() {
     const correctCount = state.answers.filter(a => a.isCorrect).length;
     const wrongCount = state.answers.length - correctCount;
     const avgTime = state.questionTimes.reduce((a, b) => a + b, 0) / state.questionTimes.length;
@@ -1145,7 +1001,7 @@ async function sendToDiscord() {
     const totalTime = (Date.now() - state.totalStartTime) / 1000;
     const percent = ((correctCount / QUESTIONS.length) * 100).toFixed(1);
     
-    // Build answers details
+    // Build answers
     let answersText = '';
     state.answers.forEach((a, i) => {
         const status = a.isCorrect ? '✅' : '❌';
@@ -1157,117 +1013,44 @@ async function sendToDiscord() {
         answersText += `> Время: ${a.timeSpent.toFixed(1)}с\n\n`;
     });
     
-    // Color based on result
-    let color;
-    if (percent >= 80) color = 0x00ff88;
-    else if (percent >= 60) color = 0xffaa00;
-    else color = 0xff3366;
+    let color = percent >= 80 ? 0x00ff88 : percent >= 60 ? 0xffaa00 : 0xff3366;
     
     const embed = {
         title: '📋 Тест завершён',
         color: color,
-        thumbnail: {
-            url: `https://mc-heads.net/avatar/${state.minecraftName}/128`
-        },
+        thumbnail: { url: `https://mc-heads.net/avatar/${state.minecraftName}/128` },
         fields: [
-            {
-                name: '👤 Discord',
-                value: `\`${state.discordName}\``,
-                inline: true
-            },
-            {
-                name: '🎮 Minecraft',
-                value: `\`${state.minecraftName}\``,
-                inline: true
-            },
-            {
-                name: '🌐 IP Адрес',
-                value: `\`${state.userIP}\``,
-                inline: true
-            },
-            {
-                name: '📊 Результат',
-                value: `**${correctCount}/${QUESTIONS.length}** (${percent}%)`,
-                inline: true
-            },
-            {
-                name: '✅ Правильных',
-                value: `${correctCount}`,
-                inline: true
-            },
-            {
-                name: '❌ Неправильных',
-                value: `${wrongCount}`,
-                inline: true
-            },
-            {
-                name: '⏱️ Среднее время',
-                value: `${avgTime.toFixed(1)} сек`,
-                inline: true
-            },
-            {
-                name: '⚡ Мин. время',
-                value: `${minTime.toFixed(1)} сек`,
-                inline: true
-            },
-            {
-                name: '🐌 Макс. время',
-                value: `${maxTime.toFixed(1)} сек`,
-                inline: true
-            },
-            {
-                name: '📱 Общее время',
-                value: `${Math.floor(totalTime / 60)}м ${Math.floor(totalTime % 60)}с`,
-                inline: true
-            },
-            {
-                name: '👀 Уходов со вкладки',
-                value: `${state.tabAwayCount} раз (${state.tabAwayTime.toFixed(1)} сек)`,
-                inline: true
-            },
-            {
-                name: '📝 Подробные ответы',
-                value: answersText.substring(0, 1024) || 'Нет данных'
-            }
+            { name: '👤 Discord', value: `\`${state.discordName}\``, inline: true },
+            { name: '🎮 Minecraft', value: `\`${state.minecraftName}\``, inline: true },
+            { name: '🌐 IP', value: `\`${state.userIP}\``, inline: true },
+            { name: '📊 Результат', value: `**${correctCount}/${QUESTIONS.length}** (${percent}%)`, inline: true },
+            { name: '✅ Правильных', value: `${correctCount}`, inline: true },
+            { name: '❌ Неправильных', value: `${wrongCount}`, inline: true },
+            { name: '⏱️ Среднее время', value: `${avgTime.toFixed(1)} сек`, inline: true },
+            { name: '⚡ Мин. время', value: `${minTime.toFixed(1)} сек`, inline: true },
+            { name: '🐌 Макс. время', value: `${maxTime.toFixed(1)} сек`, inline: true },
+            { name: '📱 Общее время', value: `${Math.floor(totalTime / 60)}м ${Math.floor(totalTime % 60)}с`, inline: true },
+            { name: '👀 Уходов', value: `${state.tabAwayCount} (${state.tabAwayTime.toFixed(1)}с)`, inline: true },
+            { name: '\u200b', value: '\u200b', inline: true },
+            { name: '📝 Подробные ответы', value: answersText.substring(0, 1024) || 'Нет данных' }
         ],
-        footer: {
-            text: `Session: ${state.sessionId}`
-        },
+        footer: { text: `Session: ${state.sessionId}` },
         timestamp: new Date().toISOString()
     };
     
-    // If answers are too long, add additional field
     if (answersText.length > 1024) {
-        embed.fields[embed.fields.length - 1].value = answersText.substring(0, 1024);
-        
         embed.fields.push({
             name: '📝 Ответы (продолжение)',
             value: answersText.substring(1024, 2048) || '...'
         });
     }
     
-    try {
-        await fetch(CONFIG.webhookURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: 'Staff Test Bot',
-                avatar_url: 'https://i.imgur.com/oBPXx0D.png',
-                embeds: [embed]
-            })
-        });
-        console.log('Results sent to Discord');
-    } catch (error) {
-        console.error('Failed to send to Discord:', error);
-    }
-    
+    await sendToWebhook(CONFIG.webhookResults, embed);
     stopTimer();
 }
 
 // ============================================
-// INITIALIZE
+// INIT
 // ============================================
 
 document.addEventListener('DOMContentLoaded', init);
