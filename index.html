@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Staff Test</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Welcome Screen -->
+        <section id="welcome-screen" class="screen active">
+            <div class="logo-container">
+                <div class="logo-glow"></div>
+                <h1 class="main-title">
+                    <span class="title-line">MINECRAFT</span>
+                    <span class="title-line accent">STAFF TEST</span>
+                </h1>
+                <div class="subtitle">Проверка знаний администратора</div>
+            </div>
+            
+            <div class="decorative-line"></div>
+            
+            <p class="welcome-text">
+                Добро пожаловать на тестирование!<br>
+                Проверьте свои знания в администрировании Minecraft серверов
+            </p>
+            
+            <button class="neon-button primary" id="start-btn">
+                <span class="btn-content">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Пройти тест
+                </span>
+                <div class="btn-glow"></div>
+            </button>
+            
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-icon">📝</div>
+                    <div class="info-text">10 вопросов</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">⏱️</div>
+                    <div class="info-text">~10 минут</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-text">Разные типы</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Screen -->
+        <section id="register-screen" class="screen">
+            <div class="screen-header">
+                <h2 class="screen-title">Регистрация</h2>
+                <p class="screen-subtitle">Введите ваши данные для начала теста</p>
+            </div>
+            
+            <form id="register-form" class="neon-form">
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+                        </svg>
+                        Discord никнейм
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" id="discord-name" class="neon-input" placeholder="username#0000 или username" required autocomplete="off">
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <svg class="label-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Minecraft никнейм
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" id="minecraft-name" class="neon-input" placeholder="Ваш игровой никнейм" required autocomplete="off">
+                        <div class="input-glow"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="neon-button primary full-width">
+                    <span class="btn-content">
+                        Начать тестирование
+                        <svg class="btn-icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </span>
+                    <div class="btn-glow"></div>
+                </button>
+            </form>
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="progress-text">Вопрос <span id="current-question">1</span> из <span id="total-questions">10</span></span>
+                        <span class="progress-percent" id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <div class="progress-glow"></div>
+                    </div>
+                </div>
+                
+                <div class="timer-container">
+                    <div class="timer-icon">⏱️</div>
+                    <span class="timer-text" id="timer">00:00</span>
+                </div>
+            </div>
+            
+            <div class="question-container" id="question-container">
+                <!-- Questions will be inserted here -->
+            </div>
+            
+            <div class="quiz-footer">
+                <button class="neon-button secondary" id="next-btn" disabled>
+                    <span class="btn-content">
+                        Следующий вопрос
+                        <svg class="btn-icon-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </span>
+                    <div class="btn-glow"></div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Results Screen -->
+        <section id="results-screen" class="screen">
+            <div class="results-container">
+                <div class="results-header">
+                    <div class="results-icon" id="results-icon">🎉</div>
+                    <h2 class="results-title" id="results-title">Тест завершён!</h2>
+                    <p class="results-subtitle" id="results-subtitle">Ваши результаты отправлены на проверку</p>
+                </div>
+                
+                <div class="score-circle">
+                    <svg class="score-ring" viewBox="0 0 120 120">
+                        <circle class="score-ring-bg" cx="60" cy="60" r="54"/>
+                        <circle class="score-ring-fill" id="score-ring-fill" cx="60" cy="60" r="54"/>
+                    </svg>
+                    <div class="score-content">
+                        <span class="score-value" id="score-value">0</span>
+                        <span class="score-label">из 10</span>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon correct">✓</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="correct-count">0</span>
+                            <span class="stat-label">Правильных</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon wrong">✗</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="wrong-count">0</span>
+                            <span class="stat-label">Неправильных</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon time">⏱</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="avg-time">0с</span>
+                            <span class="stat-label">Среднее время</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon percent">%</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="percent-correct">0%</span>
+                            <span class="stat-label">Успешность</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-message" id="results-message">
+                    Ожидайте ответа от администрации
+                </div>
+                
+                <button class="neon-button primary" onclick="location.reload()">
+                    <span class="btn-content">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                        Пройти заново
+                    </span>
+                    <div class="btn-glow"></div>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Tab Warning Overlay -->
+    <div class="tab-warning" id="tab-warning">
+        <div class="warning-content">
+            <div class="warning-icon">⚠️</div>
+            <h3>Вернитесь к тесту!</h3>
+            <p>Время отсутствия записывается</p>
+        </div>
+    </div>
+
+    <!-- Copy Protection Overlay -->
+    <div class="copy-protection" id="copy-protection">
+        <span>Копирование запрещено</span>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
