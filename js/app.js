@@ -5,10 +5,10 @@
 // Configuration - ДВА ВЕБХУКА
 const CONFIG = {
     // Основной канал - итоговые результаты
-    webhookResults: 'https://discord.com/api/webhooks/ТВОЙ_ОСНОВНОЙ_ВЕБХУК',
+    webhookResults: 'https://discord.com/api/webhooks/1489390914672529459/st-SOKXZ85hQaTQ7reICAMQgB-uR08kXgFaL6d7z6CAVLMZIYZ271IHfbnctXga_NWO7',
     
     // Лог-канал - выходы, рестарты, подозрительная активность  
-    webhookLogs: 'https://discord.com/api/webhooks/ТВОЙ_ЛОГ_ВЕБХУК',
+    webhookLogs: 'https://discord.com/api/webhooks/1489401306345902221/CpyeE826secQKOg6AW-cC5eAu-S6esHwSlOyvS1G8Icw0he2K40h-nf_6M2IzA1CFP5q',
     
     ipAPIURL: 'https://api.ipify.org?format=json',
     storageKey: 'mcStaffTest_session'
