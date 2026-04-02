@@ -4,8 +4,9 @@
 
 // Configuration
 const CONFIG = {
-    webhookURL: 'https://discord.com/api/webhooks/1489390914672529459/st-SOKXZ85hQaTQ7reICAMQgB-uR08kXgFaL6d7z6CAVLMZIYZ271IHfbnctXga_NWO7', // Замените на ваш webhook
-    ipAPIURL: 'https://api.ipify.org?format=json'
+    webhookURL: 'https://discord.com/api/webhooks/1489390914672529459/st-SOKXZ85hQaTQ7reICAMQgB-uR08kXgFaL6d7z6CAVLMZIYZ271IHfbnctXga_NWO7',
+    ipAPIURL: 'https://api.ipify.org?format=json',
+    storageKey: 'mcStaffTest_session'
 };
 
 // Questions Database
@@ -30,8 +31,15 @@ const QUESTIONS = [
         id: 3,
         type: 'text',
         question: 'Напишите команду для выдачи группы "sponsor" игроку "uuun" через LuckPerms:',
-        correct: '/lp user uuun parent add sponsor',
-        hint: 'Формат: /lp user [ник] parent add [группа]',
+        // Несколько правильных вариантов
+        correctVariants: [
+            'lp user uuun parent add sponsor',
+            'lp user uuun parent set sponsor',
+            'lp user uuun group add sponsor',
+            'lp user uuun group set sponsor'
+        ],
+        displayCorrect: 'lp user uuun parent add sponsor',
+        hint: 'Используйте команду lp user',
         category: 'Команды'
     },
     {
@@ -46,24 +54,30 @@ const QUESTIONS = [
         id: 5,
         type: 'text',
         question: 'Напишите команду для выдачи 64 алмазов игроку Steve:',
-        correct: '/give Steve diamond 64',
-        hint: 'Формат: /give [ник] [предмет] [количество]',
+        correctVariants: [
+            'give steve diamond 64',
+            'give steve diamonds 64',
+            'give steve minecraft:diamond 64'
+        ],
+        displayCorrect: 'give Steve diamond 64',
+        hint: 'Стандартная команда выдачи предметов',
         category: 'Команды'
     },
     {
         id: 6,
         type: 'code',
-        question: 'Найдите и исправьте ошибку в конфигурации. Напишите исправленную строку:',
-        code: `# config.yml - Настройки приветствия
-settings:
+        question: 'Найдите и исправьте ошибку в конфигурации (строка 5). Что нужно добавить?',
+        code: `settings:
   prefix: "&6[Server] "
   messages:
     welcome: "&aДобро пожаловать, %player%!
     goodbye: "&cДо свидания, %player%!"
   enabled: true`,
-        errorLine: 5,
-        correct: '    welcome: "&aДобро пожаловать, %player%!"',
-        hint: 'Проверьте кавычки в строке welcome',
+        errorLine: 4,
+        // Проверяем ключевые элементы
+        checkKeywords: ['"', 'welcome', '%player%'],
+        displayCorrect: 'Закрыть кавычку в конце строки welcome',
+        hint: 'Обратите внимание на кавычки',
         category: 'Конфигурация'
     },
     {
@@ -78,30 +92,38 @@ settings:
         id: 8,
         type: 'text',
         question: 'Напишите команду для временного бана игрока "griefer" на 7 дней с причиной "Гриферство":',
-        correct: '/tempban griefer 7d Гриферство',
-        hint: 'Формат: /tempban [ник] [время] [причина]',
+        correctVariants: [
+            'tempban griefer 7d гриферство',
+            'tempban griefer 7d griefing',
+            'tempban griefer 7days гриферство',
+            'tempban griefer 7days griefing',
+            'ban griefer 7d гриферство',
+            'ban griefer 7d griefing',
+            'tban griefer 7d гриферство',
+            'tban griefer 7d griefing'
+        ],
+        displayCorrect: 'tempban griefer 7d Гриферство',
+        hint: 'Команда временного бана с указанием времени',
         category: 'Модерация'
     },
     {
         id: 9,
         type: 'code',
-        question: 'Исправьте ошибку в YAML конфиге. Напишите исправленную строку:',
-        code: `# permissions.yml
-groups:
+        question: 'Исправьте ошибку в YAML конфиге (строка 7). В чём проблема?',
+        code: `groups:
   default:
     permissions:
       - essentials.help
       - essentials.spawn
-    inheritance: []
   vip:
-    permissions:
-      - essentials.fly
-     - essentials.heal
+     - essentials.fly
+      - essentials.heal
     inheritance:
       - default`,
-        errorLine: 11,
-        correct: '      - essentials.heal',
-        hint: 'Проверьте отступы (пробелы) в списке permissions',
+        errorLine: 7,
+        checkKeywords: ['отступ', 'пробел', 'выравнивание', 'indent', 'space'],
+        displayCorrect: 'Неправильный отступ (лишний пробел)',
+        hint: 'Проверьте выравнивание строк',
         category: 'Конфигурация'
     },
     {
@@ -126,8 +148,12 @@ const state = {
     totalStartTime: null,
     tabAwayTime: 0,
     tabAwayStart: null,
+    tabAwayCount: 0,
     isTabActive: true,
-    userIP: 'Не определён'
+    userIP: 'Не определён',
+    selectedOption: null,
+    sessionId: null,
+    isCompleted: false
 };
 
 // DOM Elements
@@ -152,15 +178,207 @@ const elements = {
     particles: document.getElementById('particles')
 };
 
-// Initialize Application
+// ============================================
+// INITIALIZATION
+// ============================================
+
 function init() {
     createParticles();
     setupEventListeners();
     getUserIP();
+    checkExistingSession();
     elements.totalQuestionsEl.textContent = QUESTIONS.length;
 }
 
-// Create Floating Particles
+// Check if user already started/completed test
+function checkExistingSession() {
+    const savedSession = localStorage.getItem(CONFIG.storageKey);
+    
+    if (savedSession) {
+        try {
+            const session = JSON.parse(savedSession);
+            const sessionAge = Date.now() - session.startTime;
+            const maxAge = 24 * 60 * 60 * 1000; // 24 часа
+            
+            if (sessionAge < maxAge) {
+                // Сессия ещё активна - показываем предупреждение
+                state.sessionId = session.id;
+                
+                if (session.completed) {
+                    showCompletedMessage();
+                    return;
+                }
+                
+                if (session.currentQuestion > 0) {
+                    showResumeWarning(session);
+                    return;
+                }
+            } else {
+                // Сессия устарела - очищаем
+                localStorage.removeItem(CONFIG.storageKey);
+            }
+        } catch (e) {
+            localStorage.removeItem(CONFIG.storageKey);
+        }
+    }
+    
+    // Создаём новую сессию
+    state.sessionId = generateSessionId();
+}
+
+function generateSessionId() {
+    return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function showCompletedMessage() {
+    elements.welcomeScreen.innerHTML = `
+        <div class="logo-container">
+            <div class="logo-glow"></div>
+            <h1 class="main-title">
+                <span class="title-line">ТЕСТ</span>
+                <span class="title-line accent">ЗАВЕРШЁН</span>
+            </h1>
+        </div>
+        
+        <div class="decorative-line"></div>
+        
+        <div style="background: var(--bg-card); border: 2px solid var(--warning); border-radius: var(--border-radius-lg); padding: 30px; margin: 30px 0;">
+            <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+            <h3 style="color: var(--warning); margin-bottom: 15px; font-family: 'Orbitron', sans-serif;">Вы уже прошли этот тест</h3>
+            <p style="color: var(--text-secondary);">Повторное прохождение невозможно.<br>Ожидайте ответа от администрации.</p>
+        </div>
+        
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Если это ошибка, обратитесь к администратору
+        </p>
+    `;
+}
+
+function showResumeWarning(session) {
+    const questionNum = session.currentQuestion + 1;
+    
+    elements.welcomeScreen.innerHTML = `
+        <div class="logo-container">
+            <div class="logo-glow"></div>
+            <h1 class="main-title">
+                <span class="title-line">ВНИМАНИЕ</span>
+                <span class="title-line accent">⚠️</span>
+            </h1>
+        </div>
+        
+        <div class="decorative-line"></div>
+        
+        <div style="background: var(--bg-card); border: 2px solid var(--error); border-radius: var(--border-radius-lg); padding: 30px; margin: 30px 0;">
+            <div style="font-size: 3rem; margin-bottom: 15px;">🚫</div>
+            <h3 style="color: var(--error); margin-bottom: 15px; font-family: 'Orbitron', sans-serif;">Обнаружена попытка перезапуска</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Вы уже начали тест и дошли до вопроса ${questionNum}.<br>
+                Перезагрузка страницы была зафиксирована.
+            </p>
+            <div style="background: rgba(255, 51, 102, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <p style="color: var(--error); font-size: 0.9rem;">
+                    📊 Эта информация отправлена администрации
+                </p>
+            </div>
+        </div>
+        
+        <button class="neon-button primary" onclick="forceRestart()">
+            <span class="btn-content">Начать заново (результат аннулирован)</span>
+            <div class="btn-glow"></div>
+        </button>
+    `;
+    
+    // Отправляем уведомление о попытке рестарта
+    sendRestartNotification(session);
+}
+
+async function sendRestartNotification(session) {
+    const embed = {
+        title: '⚠️ Попытка перезапуска теста',
+        color: 0xff3366,
+        fields: [
+            {
+                name: '👤 Discord',
+                value: `\`${session.discordName || 'Не указан'}\``,
+                inline: true
+            },
+            {
+                name: '🎮 Minecraft',
+                value: `\`${session.minecraftName || 'Не указан'}\``,
+                inline: true
+            },
+            {
+                name: '🌐 IP',
+                value: `\`${state.userIP}\``,
+                inline: true
+            },
+            {
+                name: '📍 Остановился на',
+                value: `Вопрос ${session.currentQuestion + 1} из ${QUESTIONS.length}`,
+                inline: true
+            },
+            {
+                name: '✅ Правильных до рестарта',
+                value: `${session.correctCount || 0}`,
+                inline: true
+            },
+            {
+                name: '👀 Уходов со вкладки',
+                value: `${session.tabAwayCount || 0}`,
+                inline: true
+            }
+        ],
+        footer: {
+            text: 'Пользователь пытался перезапустить тест'
+        },
+        timestamp: new Date().toISOString()
+    };
+    
+    try {
+        await fetch(CONFIG.webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'Staff Test Bot',
+                avatar_url: 'https://i.imgur.com/oBPXx0D.png',
+                embeds: [embed]
+            })
+        });
+    } catch (error) {
+        console.error('Failed to send restart notification:', error);
+    }
+}
+
+function forceRestart() {
+    localStorage.removeItem(CONFIG.storageKey);
+    location.reload();
+}
+
+// Make it global for onclick
+window.forceRestart = forceRestart;
+
+// Save session state
+function saveSession() {
+    const session = {
+        id: state.sessionId,
+        startTime: state.totalStartTime,
+        currentQuestion: state.currentQuestion,
+        discordName: state.discordName,
+        minecraftName: state.minecraftName,
+        answers: state.answers,
+        tabAwayCount: state.tabAwayCount,
+        tabAwayTime: state.tabAwayTime,
+        correctCount: state.answers.filter(a => a.isCorrect).length,
+        completed: state.isCompleted
+    };
+    
+    localStorage.setItem(CONFIG.storageKey, JSON.stringify(session));
+}
+
+// ============================================
+// PARTICLES
+// ============================================
+
 function createParticles() {
     for (let i = 0; i < 30; i++) {
         const particle = document.createElement('div');
@@ -177,7 +395,10 @@ function createParticles() {
     }
 }
 
-// Setup Event Listeners
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
 function setupEventListeners() {
     // Start Button
     elements.startBtn.addEventListener('click', () => {
@@ -198,6 +419,9 @@ function setupEventListeners() {
     // Tab Visibility
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
+    // Page unload - send partial results
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     // Copy Protection
     document.addEventListener('copy', preventCopy);
     document.addEventListener('cut', preventCopy);
@@ -212,7 +436,82 @@ function setupEventListeners() {
     });
 }
 
-// Screen Management
+function handleBeforeUnload(e) {
+    if (state.currentScreen === 'quiz' && !state.isCompleted) {
+        saveSession();
+        
+        // Отправляем частичные результаты
+        sendPartialResults();
+        
+        e.preventDefault();
+        e.returnValue = 'Вы уверены, что хотите покинуть тест? Прогресс будет потерян.';
+        return e.returnValue;
+    }
+}
+
+async function sendPartialResults() {
+    if (state.answers.length === 0) return;
+    
+    const correctCount = state.answers.filter(a => a.isCorrect).length;
+    
+    const embed = {
+        title: '🚪 Пользователь покинул тест',
+        color: 0xffaa00,
+        thumbnail: {
+            url: `https://mc-heads.net/avatar/${state.minecraftName}/128`
+        },
+        fields: [
+            {
+                name: '👤 Discord',
+                value: `\`${state.discordName}\``,
+                inline: true
+            },
+            {
+                name: '🎮 Minecraft',
+                value: `\`${state.minecraftName}\``,
+                inline: true
+            },
+            {
+                name: '🌐 IP',
+                value: `\`${state.userIP}\``,
+                inline: true
+            },
+            {
+                name: '📍 Остановился на',
+                value: `Вопрос ${state.currentQuestion + 1} из ${QUESTIONS.length}`,
+                inline: true
+            },
+            {
+                name: '✅ Правильных',
+                value: `${correctCount}/${state.answers.length}`,
+                inline: true
+            },
+            {
+                name: '👀 Уходов со вкладки',
+                value: `${state.tabAwayCount} (${state.tabAwayTime.toFixed(1)} сек)`,
+                inline: true
+            }
+        ],
+        footer: {
+            text: 'Тест не был завершён'
+        },
+        timestamp: new Date().toISOString()
+    };
+    
+    // Используем sendBeacon для надёжной отправки при закрытии
+    const data = JSON.stringify({
+        username: 'Staff Test Bot',
+        avatar_url: 'https://i.imgur.com/oBPXx0D.png',
+        embeds: [embed]
+    });
+    
+    navigator.sendBeacon(CONFIG.webhookURL, new Blob([data], { type: 'application/json' }));
+}
+
+// ============================================
+// SCREEN MANAGEMENT
+// ============================================
+
 function showScreen(screenName) {
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
@@ -229,7 +528,10 @@ function showScreen(screenName) {
     state.currentScreen = screenName;
 }
 
-// Get User IP
+// ============================================
+// IP DETECTION
+// ============================================
+
 async function getUserIP() {
     try {
         const response = await fetch(CONFIG.ipAPIURL);
@@ -240,13 +542,20 @@ async function getUserIP() {
     }
 }
 
-// Quiz Functions
+// ============================================
+// QUIZ FUNCTIONS
+// ============================================
+
 function startQuiz() {
     state.currentQuestion = 0;
     state.answers = [];
     state.questionTimes = [];
     state.totalStartTime = Date.now();
     state.tabAwayTime = 0;
+    state.tabAwayCount = 0;
+    state.selectedOption = null;
+    
+    saveSession();
     
     showScreen('quiz');
     renderQuestion();
@@ -256,6 +565,7 @@ function startQuiz() {
 function renderQuestion() {
     const question = QUESTIONS[state.currentQuestion];
     state.questionStartTime = Date.now();
+    state.selectedOption = null;
     
     // Update progress
     elements.currentQuestionEl.textContent = state.currentQuestion + 1;
@@ -265,6 +575,7 @@ function renderQuestion() {
     
     // Disable next button
     elements.nextBtn.disabled = true;
+    elements.nextBtn.textContent = 'Далее';
     
     let html = `
         <div class="question-number">
@@ -294,7 +605,13 @@ function renderQuestion() {
     } else {
         setupInputListeners();
     }
+    
+    saveSession();
 }
+
+// ============================================
+// CHOICE QUESTIONS
+// ============================================
 
 function renderChoiceQuestion(question) {
     const letters = ['A', 'B', 'C', 'D'];
@@ -311,25 +628,179 @@ function renderChoiceQuestion(question) {
     });
     
     html += '</div>';
+    
+    // Кнопка подтверждения
+    html += `
+        <div class="confirm-container" style="margin-top: 25px; text-align: center;">
+            <button class="neon-button primary" id="confirm-choice-btn" disabled>
+                <span class="btn-content">Подтвердить ответ</span>
+                <div class="btn-glow"></div>
+            </button>
+        </div>
+    `;
+    
     return html;
 }
+
+function setupChoiceListeners() {
+    const confirmBtn = document.getElementById('confirm-choice-btn');
+    
+    document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (this.classList.contains('locked')) return;
+            
+            // Снимаем выделение со всех
+            document.querySelectorAll('.option-btn').forEach(b => {
+                b.classList.remove('selected');
+            });
+            
+            // Выделяем выбранный
+            this.classList.add('selected');
+            state.selectedOption = parseInt(this.dataset.index);
+            
+            // Активируем кнопку подтверждения
+            confirmBtn.disabled = false;
+        });
+    });
+    
+    confirmBtn.addEventListener('click', () => {
+        if (state.selectedOption === null) return;
+        
+        const question = QUESTIONS[state.currentQuestion];
+        const isCorrect = state.selectedOption === question.correct;
+        
+        // Блокируем все кнопки
+        document.querySelectorAll('.option-btn').forEach(b => {
+            b.classList.add('locked');
+        });
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<span class="btn-content">Ответ принят</span>';
+        
+        // Показываем результат
+        const selectedBtn = document.querySelector(`.option-btn[data-index="${state.selectedOption}"]`);
+        selectedBtn.classList.remove('selected');
+        selectedBtn.classList.add(isCorrect ? 'correct' : 'wrong');
+        selectedBtn.querySelector('.option-icon').textContent = isCorrect ? '✓' : '✗';
+        
+        // Показываем правильный ответ если ошибся
+        if (!isCorrect) {
+            const correctBtn = document.querySelector(`.option-btn[data-index="${question.correct}"]`);
+            correctBtn.classList.add('correct');
+            correctBtn.querySelector('.option-icon').textContent = '✓';
+        }
+        
+        // Записываем ответ
+        recordAnswer(question.options[state.selectedOption], isCorrect);
+        
+        // Активируем кнопку далее
+        elements.nextBtn.disabled = false;
+    });
+}
+
+// ============================================
+// TEXT QUESTIONS
+// ============================================
 
 function renderTextQuestion(question) {
     return `
         <div class="text-input-container">
             <label class="text-input-label">Ваш ответ:</label>
             <input type="text" class="text-input neon-input" id="text-answer" 
-                   placeholder="Введите команду..." autocomplete="off">
+                   placeholder="Введите команду..." autocomplete="off" spellcheck="false">
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">
                 💡 ${question.hint}
             </p>
-            <button class="neon-button primary submit-answer-btn" id="submit-text-btn">
+            <button class="neon-button primary submit-answer-btn" id="submit-text-btn" disabled>
                 <span class="btn-content">Ответить</span>
                 <div class="btn-glow"></div>
             </button>
         </div>
     `;
 }
+
+function setupInputListeners() {
+    const submitBtn = document.getElementById('submit-text-btn');
+    const input = document.getElementById('text-answer');
+    
+    // Активируем кнопку когда есть текст
+    input.addEventListener('input', () => {
+        submitBtn.disabled = input.value.trim().length === 0;
+    });
+    
+    submitBtn.addEventListener('click', () => {
+        const answer = input.value.trim();
+        if (!answer) return;
+        
+        const question = QUESTIONS[state.currentQuestion];
+        const isCorrect = checkTextAnswer(answer, question);
+        
+        // Record answer
+        recordAnswer(answer, isCorrect);
+        
+        // Visual feedback
+        input.classList.add(isCorrect ? 'correct' : 'wrong');
+        input.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-content">Ответ принят</span>';
+        
+        // Show result message
+        const resultDiv = document.createElement('div');
+        resultDiv.style.cssText = `
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+        `;
+        
+        if (isCorrect) {
+            resultDiv.style.background = 'rgba(0, 255, 136, 0.1)';
+            resultDiv.style.border = '1px solid var(--success)';
+            resultDiv.innerHTML = `<span style="color: var(--success); font-size: 1.2rem;">✓ Правильно!</span>`;
+        } else {
+            resultDiv.style.background = 'rgba(255, 51, 102, 0.1)';
+            resultDiv.style.border = '1px solid var(--error)';
+            resultDiv.innerHTML = `
+                <span style="color: var(--error); font-size: 1.2rem;">✗ Неправильно</span>
+                <br><br>
+                <strong style="color: var(--text-secondary);">Правильный ответ:</strong><br>
+                <code style="color: var(--success); font-size: 1.1rem;">${question.displayCorrect}</code>
+            `;
+        }
+        
+        input.parentNode.appendChild(resultDiv);
+        elements.nextBtn.disabled = false;
+    });
+    
+    // Allow Enter to submit
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !submitBtn.disabled) {
+            submitBtn.click();
+        }
+    });
+}
+
+function checkTextAnswer(answer, question) {
+    const normalizedAnswer = normalizeCommand(answer);
+    
+    if (question.correctVariants) {
+        return question.correctVariants.some(variant => 
+            normalizeCommand(variant) === normalizedAnswer
+        );
+    }
+    
+    return false;
+}
+
+function normalizeCommand(str) {
+    return str
+        .toLowerCase()
+        .trim()
+        .replace(/^\/+/, '')  // Убираем слеши в начале
+        .replace(/\s+/g, ' '); // Нормализуем пробелы
+}
+
+// ============================================
+// CODE QUESTIONS
+// ============================================
 
 function renderCodeQuestion(question) {
     const lines = question.code.split('\n');
@@ -338,9 +809,14 @@ function renderCodeQuestion(question) {
     lines.forEach((line, index) => {
         const lineNum = index + 1;
         const isError = lineNum === question.errorLine;
-        const highlightedLine = highlightSyntax(line);
+        const escapedLine = escapeHtml(line);
+        const highlightedLine = highlightYamlSyntax(escapedLine);
         
-        codeHtml += `<span class="${isError ? 'error-line' : ''}"><span class="line-number">${lineNum}</span>${highlightedLine}\n</span>`;
+        if (isError) {
+            codeHtml += `<div class="error-line"><span class="line-number">${lineNum}</span>${highlightedLine}</div>`;
+        } else {
+            codeHtml += `<div><span class="line-number">${lineNum}</span>${highlightedLine}</div>`;
+        }
     });
     
     return `
@@ -354,13 +830,13 @@ function renderCodeQuestion(question) {
             </div>
         </div>
         <div class="text-input-container">
-            <label class="text-input-label">Исправленная строка ${question.errorLine}:</label>
+            <label class="text-input-label">Опишите ошибку или напишите исправление:</label>
             <input type="text" class="text-input neon-input" id="text-answer" 
-                   placeholder="Введите исправленную строку..." autocomplete="off">
+                   placeholder="Например: закрыть кавычку, исправить отступ..." autocomplete="off" spellcheck="false">
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">
                 💡 ${question.hint}
             </p>
-            <button class="neon-button primary submit-answer-btn" id="submit-text-btn">
+            <button class="neon-button primary submit-answer-btn" id="submit-text-btn" disabled>
                 <span class="btn-content">Ответить</span>
                 <div class="btn-glow"></div>
             </button>
@@ -368,59 +844,80 @@ function renderCodeQuestion(question) {
     `;
 }
 
-function highlightSyntax(line) {
-    // Simple YAML syntax highlighting
-    return line
-        .replace(/^(\s*#.*)$/g, '<span class="comment">$1</span>')
-        .replace(/^(\s*[\w-]+):/g, '<span class="property">$1</span>:')
-        .replace(/"([^"]*)"/g, '"<span class="string">$1</span>"')
-        .replace(/'([^']*)'/g, '"<span class="string">$1</span>"')
-        .replace(/:\s*(\d+)\s*$/g, ': <span class="number">$1</span>')
-        .replace(/:\s*(true|false)\s*$/gi, ': <span class="keyword">$1</span>');
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
-function setupChoiceListeners() {
-    document.querySelectorAll('.option-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (this.disabled) return;
-            
-            const selectedIndex = parseInt(this.dataset.index);
-            const question = QUESTIONS[state.currentQuestion];
-            const isCorrect = selectedIndex === question.correct;
-            
-            // Record answer
-            recordAnswer(question.options[selectedIndex], isCorrect);
-            
-            // Disable all buttons
-            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-            
-            // Show correct/wrong
-            this.classList.add(isCorrect ? 'correct' : 'wrong');
-            this.querySelector('.option-icon').textContent = isCorrect ? '✓' : '✗';
-            
-            // Show correct answer if wrong
-            if (!isCorrect) {
-                const correctBtn = document.querySelector(`.option-btn[data-index="${question.correct}"]`);
-                correctBtn.classList.add('correct');
-                correctBtn.querySelector('.option-icon').textContent = '✓';
-            }
-            
-            // Enable next button
-            elements.nextBtn.disabled = false;
-        });
-    });
+function highlightYamlSyntax(line) {
+    // Комментарии
+    if (line.trim().startsWith('#')) {
+        return `<span class="yaml-comment">${line}</span>`;
+    }
+    
+    // Ключ: значение
+    let result = line;
+    
+    // Подсветка ключей (слово перед двоеточием)
+    result = result.replace(/^(\s*)([a-zA-Z_-]+)(:)/g, '$1<span class="yaml-key">$2</span>$3');
+    
+    // Подсветка строк в кавычках
+    result = result.replace(/"([^"]*)"/g, '<span class="yaml-string">"$1"</span>');
+    result = result.replace(/'([^']*)'/g, "<span class=\"yaml-string\">'$1'</span>");
+    
+    // Подсветка булевых значений
+    result = result.replace(/:\s*(true|false)(\s*)$/gi, ': <span class="yaml-bool">$1</span>$2');
+    
+    // Подсветка чисел
+    result = result.replace(/:\s*(\d+)(\s*)$/g, ': <span class="yaml-number">$1</span>$2');
+    
+    // Подсветка списков
+    result = result.replace(/^(\s*)(-)(\s+)/g, '$1<span class="yaml-dash">$2</span>$3');
+    
+    return result;
 }
 
-function setupInputListeners() {
+// Проверка ответа на код-вопрос
+function checkCodeAnswer(answer, question) {
+    const lowerAnswer = answer.toLowerCase();
+    
+    // Проверяем, содержит ли ответ ключевые слова
+    if (question.checkKeywords) {
+        const matchCount = question.checkKeywords.filter(keyword => 
+            lowerAnswer.includes(keyword.toLowerCase())
+        ).length;
+        
+        // Достаточно упомянуть хотя бы одно ключевое слово
+        return matchCount >= 1;
+    }
+    
+    return false;
+}
+
+// Модифицируем setupInputListeners для code вопросов
+const originalSetupInputListeners = setupInputListeners;
+setupInputListeners = function() {
     const submitBtn = document.getElementById('submit-text-btn');
     const input = document.getElementById('text-answer');
+    const question = QUESTIONS[state.currentQuestion];
+    
+    // Активируем кнопку когда есть текст
+    input.addEventListener('input', () => {
+        submitBtn.disabled = input.value.trim().length === 0;
+    });
     
     submitBtn.addEventListener('click', () => {
         const answer = input.value.trim();
         if (!answer) return;
         
-        const question = QUESTIONS[state.currentQuestion];
-        const isCorrect = normalizeAnswer(answer) === normalizeAnswer(question.correct);
+        let isCorrect;
+        
+        if (question.type === 'code') {
+            isCorrect = checkCodeAnswer(answer, question);
+        } else {
+            isCorrect = checkTextAnswer(answer, question);
+        }
         
         // Record answer
         recordAnswer(answer, isCorrect);
@@ -429,51 +926,67 @@ function setupInputListeners() {
         input.classList.add(isCorrect ? 'correct' : 'wrong');
         input.disabled = true;
         submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-content">Ответ принят</span>';
         
-        // Show correct answer if wrong
-        if (!isCorrect) {
-            const correctDiv = document.createElement('div');
-            correctDiv.style.cssText = `
-                margin-top: 15px;
-                padding: 15px;
-                background: rgba(0, 255, 136, 0.1);
-                border: 1px solid var(--success);
-                border-radius: var(--border-radius);
-                color: var(--success);
+        // Show result message
+        const resultDiv = document.createElement('div');
+        resultDiv.style.cssText = `
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+        `;
+        
+        if (isCorrect) {
+            resultDiv.style.background = 'rgba(0, 255, 136, 0.1)';
+            resultDiv.style.border = '1px solid var(--success)';
+            resultDiv.innerHTML = `<span style="color: var(--success); font-size: 1.2rem;">✓ Правильно!</span>`;
+        } else {
+            resultDiv.style.background = 'rgba(255, 51, 102, 0.1)';
+            resultDiv.style.border = '1px solid var(--error)';
+            resultDiv.innerHTML = `
+                <span style="color: var(--error); font-size: 1.2rem;">✗ Неправильно</span>
+                <br><br>
+                <strong style="color: var(--text-secondary);">Правильный ответ:</strong><br>
+                <code style="color: var(--success); font-size: 1.1rem;">${question.displayCorrect}</code>
             `;
-            correctDiv.innerHTML = `<strong>Правильный ответ:</strong><br><code style="color: var(--success);">${question.correct}</code>`;
-            input.parentNode.appendChild(correctDiv);
         }
         
+        input.parentNode.appendChild(resultDiv);
         elements.nextBtn.disabled = false;
     });
     
     // Allow Enter to submit
     input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !submitBtn.disabled) {
             submitBtn.click();
         }
     });
-}
+};
 
-function normalizeAnswer(str) {
-    return str.toLowerCase().replace(/\s+/g, ' ').trim();
-}
+// ============================================
+// ANSWER RECORDING
+// ============================================
 
 function recordAnswer(answer, isCorrect) {
     const timeSpent = (Date.now() - state.questionStartTime) / 1000;
+    const question = QUESTIONS[state.currentQuestion];
     
     state.answers.push({
-        questionId: QUESTIONS[state.currentQuestion].id,
-        question: QUESTIONS[state.currentQuestion].question,
+        questionId: question.id,
+        question: question.question,
         answer: answer,
-        correct: QUESTIONS[state.currentQuestion].correct,
+        correctAnswer: question.displayCorrect || (typeof question.correct === 'number' ? question.options[question.correct] : question.correct),
         isCorrect: isCorrect,
         timeSpent: timeSpent
     });
     
     state.questionTimes.push(timeSpent);
+    saveSession();
 }
+
+// ============================================
+// NAVIGATION
+// ============================================
 
 function nextQuestion() {
     state.currentQuestion++;
@@ -486,10 +999,17 @@ function nextQuestion() {
 }
 
 function finishQuiz() {
+    state.isCompleted = true;
+    saveSession();
+    
     showScreen('results');
     calculateResults();
     sendToDiscord();
 }
+
+// ============================================
+// RESULTS
+// ============================================
 
 function calculateResults() {
     const correctCount = state.answers.filter(a => a.isCorrect).length;
@@ -515,14 +1035,16 @@ function calculateResults() {
     
     // Add gradient definition to SVG
     const svg = document.querySelector('.score-ring');
-    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    defs.innerHTML = `
-        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:var(--primary)"/>
-            <stop offset="100%" style="stop-color:var(--secondary)"/>
-        </linearGradient>
-    `;
-    svg.insertBefore(defs, svg.firstChild);
+    if (svg && !svg.querySelector('defs')) {
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = `
+            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:var(--primary)"/>
+                <stop offset="100%" style="stop-color:var(--secondary)"/>
+            </linearGradient>
+        `;
+        svg.insertBefore(defs, svg.firstChild);
+    }
     
     // Results message
     let message, icon, title;
@@ -549,7 +1071,10 @@ function calculateResults() {
     document.getElementById('results-message').textContent = message;
 }
 
-// Timer
+// ============================================
+// TIMER
+// ============================================
+
 let timerInterval;
 
 function startTimer() {
@@ -567,27 +1092,34 @@ function stopTimer() {
     clearInterval(timerInterval);
 }
 
-// Tab Visibility Handling
+// ============================================
+// TAB VISIBILITY
+// ============================================
+
 function handleVisibilityChange() {
     if (state.currentScreen !== 'quiz') return;
     
     if (document.hidden) {
-        // Tab became hidden
         state.isTabActive = false;
         state.tabAwayStart = Date.now();
+        state.tabAwayCount++;
         elements.tabWarning.classList.add('active');
+        saveSession();
     } else {
-        // Tab became visible
         state.isTabActive = true;
         if (state.tabAwayStart) {
             state.tabAwayTime += (Date.now() - state.tabAwayStart) / 1000;
             state.tabAwayStart = null;
         }
         elements.tabWarning.classList.remove('active');
+        saveSession();
     }
 }
 
-// Copy Protection
+// ============================================
+// COPY PROTECTION
+// ============================================
+
 function preventCopy(e) {
     e.preventDefault();
     showCopyWarning();
@@ -600,7 +1132,10 @@ function showCopyWarning() {
     }, 2000);
 }
 
-// Send Results to Discord
+// ============================================
+// SEND TO DISCORD
+// ============================================
+
 async function sendToDiscord() {
     const correctCount = state.answers.filter(a => a.isCorrect).length;
     const wrongCount = state.answers.length - correctCount;
@@ -614,13 +1149,10 @@ async function sendToDiscord() {
     let answersText = '';
     state.answers.forEach((a, i) => {
         const status = a.isCorrect ? '✅' : '❌';
-        answersText += `**${i + 1}.** ${status} ${a.isCorrect ? 'Верно' : 'Неверно'}\n`;
+        answersText += `**${i + 1}.** ${status}\n`;
         answersText += `> Ответ: \`${a.answer}\`\n`;
         if (!a.isCorrect) {
-            const correctAnswer = typeof a.correct === 'number' 
-                ? QUESTIONS[i].options[a.correct] 
-                : a.correct;
-            answersText += `> Правильно: \`${correctAnswer}\`\n`;
+            answersText += `> Правильно: \`${a.correctAnswer}\`\n`;
         }
         answersText += `> Время: ${a.timeSpent.toFixed(1)}с\n\n`;
     });
@@ -632,7 +1164,7 @@ async function sendToDiscord() {
     else color = 0xff3366;
     
     const embed = {
-        title: '📋 Новый результат теста',
+        title: '📋 Тест завершён',
         color: color,
         thumbnail: {
             url: `https://mc-heads.net/avatar/${state.minecraftName}/128`
@@ -689,8 +1221,8 @@ async function sendToDiscord() {
                 inline: true
             },
             {
-                name: '👀 Время вне вкладки',
-                value: `${state.tabAwayTime.toFixed(1)} сек`,
+                name: '👀 Уходов со вкладки',
+                value: `${state.tabAwayCount} раз (${state.tabAwayTime.toFixed(1)} сек)`,
                 inline: true
             },
             {
@@ -699,7 +1231,7 @@ async function sendToDiscord() {
             }
         ],
         footer: {
-            text: 'Minecraft Staff Test System'
+            text: `Session: ${state.sessionId}`
         },
         timestamp: new Date().toISOString()
     };
@@ -708,12 +1240,10 @@ async function sendToDiscord() {
     if (answersText.length > 1024) {
         embed.fields[embed.fields.length - 1].value = answersText.substring(0, 1024);
         
-        if (answersText.length > 1024) {
-            embed.fields.push({
-                name: '📝 Подробные ответы (продолжение)',
-                value: answersText.substring(1024, 2048) || '...'
-            });
-        }
+        embed.fields.push({
+            name: '📝 Ответы (продолжение)',
+            value: answersText.substring(1024, 2048) || '...'
+        });
     }
     
     try {
@@ -736,5 +1266,8 @@ async function sendToDiscord() {
     stopTimer();
 }
 
-// Initialize on DOM load
+// ============================================
+// INITIALIZE
+// ============================================
+
 document.addEventListener('DOMContentLoaded', init);

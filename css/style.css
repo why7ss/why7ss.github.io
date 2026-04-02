@@ -1240,3 +1240,48 @@ body {
     background: var(--primary);
     color: var(--bg-dark);
 }
+
+/* YAML Syntax Highlighting */
+.yaml-comment { color: #6a737d; font-style: italic; }
+.yaml-key { color: #79c0ff; }
+.yaml-string { color: #a5d6ff; }
+.yaml-bool { color: #ff7b72; }
+.yaml-number { color: #d2a8ff; }
+.yaml-dash { color: #ff7b72; font-weight: bold; }
+
+.code-block pre {
+    margin: 0;
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #e6edf3;
+}
+
+.code-block .line-number {
+    display: inline-block;
+    width: 30px;
+    color: #6e7681;
+    text-align: right;
+    padding-right: 15px;
+    user-select: none;
+}
+
+.code-block .error-line {
+    background: rgba(255, 51, 102, 0.15);
+    display: block;
+    margin: 0 -20px;
+    padding: 2px 20px;
+    border-left: 3px solid var(--error);
+}
+
+/* Option button locked state */
+.option-btn.locked {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.option-btn.locked:hover {
+    transform: none;
+    border-color: rgba(0, 245, 255, 0.2);
+    background: var(--bg-medium);
+}
