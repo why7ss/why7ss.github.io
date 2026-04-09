@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  base: '/why7ss.github.io/',  // Замени 'easygame' на название твоего репозитория
   plugins: [react()],
   server: {
     port: 3000,
