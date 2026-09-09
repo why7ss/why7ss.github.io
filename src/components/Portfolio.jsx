@@ -7,7 +7,7 @@ const FILTERS = [
   { key: 'all', label: 'Все' },
   { key: 'plugin', label: 'Плагины' },
   { key: 'mod', label: 'Моды' },
-  { key: 'modpack', label: 'Сборки' },
+  { key: 'server', label: 'Сборки' },
 ]
 
 export default function Portfolio({ projects }) {

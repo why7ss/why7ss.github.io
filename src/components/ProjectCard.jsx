@@ -4,7 +4,7 @@ import { Github, Lock, ArrowUpRight } from 'lucide-react'
 const TYPE_LABEL = {
   plugin: 'Плагин',
   mod: 'Мод',
-  modpack: 'Сборка',
+  server: 'Сборка',
 }
 
 export default function ProjectCard({ project, wide = false }) {

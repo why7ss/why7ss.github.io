@@ -17,20 +17,20 @@
     {
       "id": "core-java",
       "title": "Core Java",
-      "description": "10+ лет с JVM: многопоточность, GC-тюнинг, чистая объектная архитектура вместо god-классов.",
+      "description": "3+ года с Java: многопоточность, оптимизация, чистая объектная архитектура вместо god-классов.",
       "icon": "Coffee",
       "size": "lg"
     },
     {
       "id": "spigot-paper",
       "title": "Spigot / Paper API",
-      "description": "Кастомные плагины любой сложности — от экономики до античита.",
+      "description": "Кастомные плагины любой сложности - от экономики до античита.",
       "icon": "Server",
       "size": "sm"
     },
     {
-      "id": "forge-fabric",
-      "title": "Forge / Fabric",
+      "id": "fabric",
+      "title": "Fabric",
       "description": "Клиентские и серверные моды, Mixin, кастомные рендеры и логика блоков.",
       "icon": "Boxes",
       "size": "sm"
@@ -67,83 +67,73 @@
   "projects": [
     {
       "id": "1",
-      "title": "RedisEcoSync",
+      "title": "MaceRoulette",
       "type": "plugin",
-      "description": "Кросс-серверная экономика с синхронизацией баланса в реальном времени через Redis pub/sub. Держит согласованность данных на сетях от 20+ серверов.",
-      "status": "open",
-      "githubUrl": "https://github.com/uuun/redis-eco-sync",
-      "tags": ["Java", "Paper API", "Redis", "MySQL"],
+      "description": "Игровой плагин рулетки с кастомными режимами, большой механикой игр, работой с пакетами и встроенным мини-античитом от кликеров и скриптов. Масштабный codebase: 200k+ строк кода.",
+      "status": "closed",
+      "githubUrl": "",
+      "tags": ["Java", "Paper API", "PacketEvents", "Anti-Cheat"],
       "image": "./images/proj-1.svg"
     },
     {
       "id": "2",
-      "title": "NexusCore",
+      "title": "DarkAPI",
       "type": "plugin",
-      "description": "Внутренний фреймворк для сети из 40+ серверов: общая система прав, конфигов и межсерверных событий.",
-      "status": "closed",
-      "githubUrl": "",
-      "tags": ["Java", "Paper API", "gRPC"],
+      "description": "Приватный служебный фреймворк для ускорения разработки: содержит обёртки для работы с MiniMessage, утилиты парсинга компонентов и хелперы для сокращения boilerplate-кода.",
+      "status": "open",
+      "githubUrl": "https://github.com/why7ss/DarkAPI",
+      "tags": ["Java", "Paper API", "MiniMessage", "Adventure API"],
       "image": "./images/proj-2.svg"
     },
     {
       "id": "3",
-      "title": "Ancient Relics",
-      "type": "mod",
-      "description": "Мод на исследование руин с процедурной генерацией подземелий и системой артефактов на Mixin.",
-      "status": "open",
-      "githubUrl": "https://github.com/uuun/ancient-relics",
-      "tags": ["Forge", "Mixin", "Kotlin"],
+      "title": "Brainrots",
+      "type": "server",
+      "description": "Кастомная сборка сервера — полная воссозданная копия плейса «Steal a Brainrot» из Roblox. Включает уникальную архитектуру, настроенную механику воровства и кастомные 3D-модели итальянских бреинротов.",
+      "status": "closed",
+      "githubUrl": "",
+      "tags": ["Java", "Paper API", "DH API", "Model Engine"],
       "image": "./images/proj-3.svg"
     },
     {
       "id": "4",
-      "title": "TerraForged: Expansion",
-      "type": "mod",
-      "description": "Расширение генерации мира: новые биомы, климатическая модель и совместимость с существующими world-gen модами.",
+      "title": "DarkMSG",
+      "type": "plugin",
+      "description": "Легковесный плагин для стилизации системных сообщений входа и выхода: автоматически форматирует ники игроков в шрифты Small Caps и поддерживает гибкую настройку через конфигурацию.",
       "status": "closed",
       "githubUrl": "",
-      "tags": ["Fabric", "World-Gen", "Java"],
+      "tags": ["Java", "Paper API", "MiniMessage", "String Formatting"],
       "image": "./images/proj-4.svg"
     },
     {
       "id": "5",
-      "title": "Frontier Network Pack",
-      "type": "modpack",
-      "description": "Сборка для выживания на 60 модов, оптимизированная под слабое железо клиента без потери контента.",
-      "status": "open",
-      "githubUrl": "https://github.com/uuun/frontier-network-pack",
-      "tags": ["Forge", "CurseForge", "Оптимизация"],
+      "title": "AutoParkour",
+      "type": "plugin",
+      "description": "Клиентский мод без использования baritone для автоматического прохождения паркура на базе плагина ajParkour. Осуществляет автоматический старт с нажимной плиты и безупречное выполнение прыжков любой сложности.",
+      "status": "closed",
+      "githubUrl": "",
+      "tags": ["Java", "Fabric", "Auto-Parkour", "Pathfinding"],
       "image": "./images/proj-5.svg"
     },
     {
       "id": "6",
-      "title": "Wraith SMP",
-      "type": "modpack",
-      "description": "Закрытая сборка под приватный SMP: кастомная прогрессия, баланс и уникальные механики под заказ.",
+      "title": "MobsOptimizer",
+      "type": "plugin",
+      "description": "Высокопроизводительный плагин контроля сущностей для Folia: использует асинхронный поиск в многопоточной среде, заморозку ИИ мобов при превышении лимитов в чанке, а также систему оповещения игроков и администрации.",
       "status": "closed",
       "githubUrl": "",
-      "tags": ["NeoForge", "Datapack", "Баланс"],
+      "tags": ["Java", "Folia API", "Multithreading", "Optimization", "Chunk Management"],
       "image": "./images/proj-6.svg"
     },
     {
       "id": "7",
-      "title": "Guild Manager",
+      "title": "WarProject",
       "type": "plugin",
-      "description": "Система гильдий с территориями, войнами и общей казной. Гибкая настройка через YAML без перезапуска.",
-      "status": "open",
-      "githubUrl": "https://github.com/uuun/guild-manager",
-      "tags": ["Java", "Spigot", "SQLite"],
+      "description": "Масштабный политический плагин с акцентом на чистую архитектуру и принципы ООП: реализованы механики стран, дивизий, исследований, национальных фокусов и дипломатии в стиле глобальных стратегий.",
+      "status": "closed",
+      "githubUrl": "",
+      "tags": ["Java", "Paper API", "Clean Architecture", "OOP", "Game Logic"],
       "image": "./images/proj-7.svg"
-    },
-    {
-      "id": "8",
-      "title": "Dimensional Rifts",
-      "type": "mod",
-      "description": "Портальные разломы с собственным измерением, мобами и лутом, интегрированные в ванильный прогресс игры.",
-      "status": "open",
-      "githubUrl": "https://github.com/uuun/dimensional-rifts",
-      "tags": ["Fabric", "Mixin", "Java"],
-      "image": "./images/proj-8.svg"
     }
   ]
 }
