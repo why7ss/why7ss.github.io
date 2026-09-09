@@ -4,35 +4,40 @@ import { RevealGroup, RevealItem } from './Reveal.jsx'
 
 const ICON_MAP = { Coffee, Server, Boxes, Layers, Database, GitBranch, Gauge, Box }
 
+// Перешли на 12-колоночную сетку для более гибокого распределения ширины
 const SPAN = {
-  lg: 'sm:col-span-2 lg:col-span-2 lg:row-span-2',
-  md: 'sm:col-span-2 lg:col-span-2 lg:row-span-1',
-  sm: 'sm:col-span-1 lg:col-span-1 lg:row-span-1',
+  lg: 'col-span-12 md:col-span-6 lg:col-span-6',
+  md: 'col-span-12 md:col-span-6 lg:col-span-4',
+  sm: 'col-span-12 md:col-span-6 lg:col-span-3',
 }
 
 function SkillCard({ skill }) {
   const Icon = ICON_MAP[skill.icon] ?? Box
-  const large = skill.size === 'lg'
+  
+  // Автоматический расчет требуемого размера, если он не задан явно
+  const descLength = skill.description?.length || 0
+  const derivedSize = skill.size || (descLength > 120 ? 'lg' : descLength > 60 ? 'md' : 'sm')
+  const large = derivedSize === 'lg'
 
   return (
     <RevealItem
-      className={`group relative flex flex-col justify-between overflow-hidden border border-line bg-surface p-6 md:p-7 transition-colors duration-300 hover:border-accent/60 ${SPAN[skill.size] ?? SPAN.sm}`}
+      className={`group relative flex flex-col justify-between overflow-hidden border border-line bg-surface p-6 md:p-8 transition-all duration-300 hover:border-accent/60 ${SPAN[derivedSize] ?? SPAN.sm}`}
     >
       <div className="flex items-start justify-between">
         <Icon
-          size={large ? 34 : 26}
+          size={large ? 32 : 24}
           strokeWidth={1.4}
           className="text-accent transition-transform duration-300 ease-out-quart group-hover:-translate-y-0.5"
         />
       </div>
 
-      <div className="mt-6">
-        <h3 className={`font-display text-ink ${large ? 'text-3xl md:text-4xl' : 'text-xl'}`}>
+      <div className="mt-8 flex flex-col justify-end h-full">
+        <h3 className={`font-display text-ink font-semibold ${large ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'}`}>
           {skill.title}
         </h3>
         <p
           className={`mt-2.5 text-muted leading-relaxed ${
-            large ? 'text-base max-w-sm line-clamp-3' : 'text-sm line-clamp-2'
+            large ? 'text-base opacity-90' : 'text-sm opacity-80'
           }`}
         >
           {skill.description}
@@ -59,15 +64,14 @@ export default function Skills({ skills }) {
             Инструменты, на которых держится продакшен
           </h2>
           <p className="mt-4 text-muted leading-relaxed">
-            От логики на сервере до архитектуры сборки - стек, которым закрываю задачи любого
-            масштаба.
+            От логики на сервере до архитектуры сборки — стек, которым закрываю задачи любого масштаба.
           </p>
         </motion.div>
 
         <RevealGroup
           as="div"
           stagger={0.08}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(200px,auto)] gap-3 md:gap-4"
+          className="grid grid-cols-12 gap-4 md:gap-5"
         >
           {skills.map((skill) => (
             <SkillCard key={skill.id} skill={skill} />
