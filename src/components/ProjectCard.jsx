@@ -25,8 +25,10 @@ export default function ProjectCard({ project, wide = false }) {
     >
       <Wrapper
         {...wrapperProps}
-        className={`group relative flex h-full flex-col overflow-hidden border border-line bg-surface transition-colors duration-300 ${
-          isOpen ? 'hover:border-accent/60 cursor-pointer' : 'hover:border-line'
+        className={`group relative flex h-full flex-col overflow-hidden border bg-surface transition-colors duration-300 ${
+          isOpen
+            ? 'border-accent/60 hover:border-accent cursor-pointer'
+            : 'border-line hover:border-line'
         }`}
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-surface2">
