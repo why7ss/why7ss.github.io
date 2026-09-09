@@ -107,8 +107,8 @@
       "title": "DarkMSG",
       "type": "plugin",
       "description": "Легковесный плагин для стилизации системных сообщений входа и выхода: автоматически форматирует ники игроков в шрифты Small Caps и поддерживает гибкую настройку через конфигурацию.",
-      "status": "closed",
-      "githubUrl": "",
+      "status": "open",
+      "githubUrl": "https://github.com/why7ss/DarkMSG",
       "tags": ["Java", "Paper API", "MiniMessage", "String Formatting"],
       "image": "./images/proj-4.svg"
     },
