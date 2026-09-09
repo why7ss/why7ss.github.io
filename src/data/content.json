@@ -22,24 +22,24 @@
       "size": "lg"
     },
     {
-      "id": "mysql-redis",
-      "title": "MySQL / Redis",
-      "description": "Схемы данных под высокую нагрузку, кэширование, синхронизация между нодами.",
-      "icon": "Database",
-      "size": "lg"
-    },
-    {
       "id": "spigot-paper",
       "title": "Spigot / Paper API",
       "description": "Кастомные плагины любой сложности, от экономики до античита.",
       "icon": "Server",
+      "size": "lg"
+    },
+    {
+      "id": "folia",
+      "title": "Folia",
+      "description": "Асинхронные задачи, многопоточность и оптимизация серверов под высокую нагрузку.",
+      "icon": "Server",
       "size": "sm"
     },
     {
-      "id": "fabric",
-      "title": "Fabric",
-      "description": "Клиентские и серверные моды, Mixin, кастомные рендеры и логика блоков.",
-      "icon": "Boxes",
+      "id": "mysql-redis",
+      "title": "MySQL / Redis",
+      "description": "Схемы данных под высокую нагрузку, кэширование, синхронизация между нодами.",
+      "icon": "Database",
       "size": "sm"
     },
     {
@@ -61,6 +61,13 @@
       "title": "Sponge",
       "description": "Гибкие плагины для нестандартных серверных ядер.",
       "icon": "Layers",
+      "size": "sm"
+    },
+    {
+      "id": "fabric",
+      "title": "Fabric",
+      "description": "Клиентские и серверные моды, Mixin, кастомные рендеры и логика блоков.",
+      "icon": "Boxes",
       "size": "sm"
     }
   ],
