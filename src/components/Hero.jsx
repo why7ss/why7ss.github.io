@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Github, MessageCircle, Send, Mail, ArrowDownRight } from 'lucide-react'
+import { Github, MessageCircle, Send, Mail, ArrowDownRight, Check } from 'lucide-react'
 
 const ICONS = { github: Github, discord: MessageCircle, telegram: Send, mail: Mail }
 
@@ -19,9 +20,16 @@ const item = {
 }
 
 export default function Hero({ profile }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyDiscord = (text) => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <section id="top" className="relative overflow-hidden pt-40 pb-28 md:pt-52 md:pb-36">
-      {/* subtle isometric wireframe accent, desktop only */}
       <svg
         className="pointer-events-none absolute -right-24 top-24 hidden lg:block opacity-[0.35]"
         width="420"
@@ -93,6 +101,23 @@ export default function Hero({ profile }) {
           <div className="flex items-center gap-2">
             {profile.socials.map((s) => {
               const Icon = ICONS[s.icon] ?? Mail
+              const isDiscord = s.icon === 'discord'
+
+              if (isDiscord) {
+                return (
+                  <button
+                    key={s.label}
+                    type="button"
+                    onClick={() => handleCopyDiscord(s.url)}
+                    aria-label={`Скопировать Discord: ${s.url}`}
+                    title={copied ? 'Скопировано!' : `Скопировать Discord: ${s.url}`}
+                    className="relative inline-flex h-11 w-11 items-center justify-center border border-line text-muted hover:text-accent hover:border-accent transition-colors duration-300 cursor-pointer"
+                  >
+                    {copied ? <Check size={18} className="text-accent" /> : <Icon size={18} strokeWidth={1.6} />}
+                  </button>
+                )
+              }
+
               return (
                 <a
                   key={s.label}
