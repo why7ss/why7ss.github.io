@@ -5,12 +5,12 @@
     "tagline": "Плагины, моды и сборки для Minecraft, которые держат нагрузку",
     "bio": "Пишу серверные плагины, клиентские моды и собираю модпаки под конкретные проекты — от небольших SMP до сетей на тысячи игроков. Люблю чистую архитектуру, предсказуемый TPS и код, который переживёт следующее обновление.",
     "location": "Удалённо",
-    "availability": "Открыт для проектов",
+    "availability": "Работаю на SkyPK, но открыт к предложениям",
     "socials": [
-      { "label": "GitHub", "url": "https://github.com/uuun", "icon": "github" },
-      { "label": "Discord", "url": "https://discord.com/users/uuun", "icon": "discord" },
-      { "label": "Telegram", "url": "https://t.me/uuun", "icon": "telegram" },
-      { "label": "Email", "url": "mailto:hello@uuun.dev", "icon": "mail" }
+      { "label": "GitHub", "url": "https://github.com/why7ss", "icon": "github" },
+      { "label": "Discord", "url": "vinietka", "icon": "discord" },
+      { "label": "Telegram", "url": "https://t.me/why7ss", "icon": "telegram" },
+      { "label": "Email", "url": "mailto:why7ss7why@gmail.com", "icon": "mail" }
     ]
   },
   "skills": [
