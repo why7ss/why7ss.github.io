@@ -130,8 +130,8 @@
       "title": "WarProject",
       "type": "plugin",
       "description": "Масштабный политический плагин с акцентом на чистую архитектуру и принципы ООП: реализованы механики стран, дивизий, исследований, национальных фокусов и дипломатии в стиле глобальных стратегий.",
-      "status": "closed",
-      "githubUrl": "",
+      "status": "open",
+      "githubUrl": "https://github.com/why7ss/WarProject",
       "tags": ["Java", "Paper API", "Clean Architecture", "OOP", "Game Logic"],
       "image": "./images/proj-7.svg"
     }
