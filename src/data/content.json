@@ -102,6 +102,51 @@
         {
           "type": "text",
           "value": "Весь функционал работает на кастомной архитектуре, которая позволяет легко добавлять новые режимы, модификаторы и предметы."
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/1.png",
+          "caption": "Основной вид спавна"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/2.png",
+          "caption": "Меню выбора 3D-модели скинов на булаву"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/3.png",
+          "caption": "Меню выбора 3D-модели эффектов убийств"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/4.png",
+          "caption": "Меню выбора 3D-модели эффектов убийств (вторая страница)"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/5.png",
+          "caption": "Меню сервера"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/6.png",
+          "caption": "Меню сервера 2"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/7.png",
+          "caption": "Меню сервера 3"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/8.png",
+          "caption": "Ежедневные задания"
+        },
+        {
+          "type": "image",
+          "url": "./images/maceroulette/9.png",
+          "caption": "Анти-спам, 3D модель булавы"
         }
       ]
     },
@@ -132,6 +177,10 @@
         {
           "type": "text",
           "value": "Воровство бреинротов, отдельные независимые лобби (10) с лимитом игроков (10), кастомные 3D-модели с анимациями, механика закрытия дверей и добавления в друзья игроков, 3 кастомных предмета, система перерождений, ивенты. Каждый бреинрот имеет свою редкость, стоимость, модификатор, хитбокс."
+        },
+        {
+          "type": "text",
+          "value": "Нагрузка была лишь со стороны сети заказчика (трафик сети не справлялся с отправкой пакетов 3D-моделей бреинротов), причина этого была в том, что заказчик делал свой небольшой хостинг."
         },
         {
           "type": "image",
@@ -212,7 +261,14 @@
       "status": "open",
       "githubUrl": "https://github.com/why7ss/DarkMSG",
       "tags": ["Java", "Paper API", "MiniMessage", "String Formatting"],
-      "image": "./images/proj-4.svg"
+      "image": "./images/proj-4.svg",
+      "content": [
+        {
+          "type": "image",
+          "url": "./images/darkmsg.png",
+          "caption": "Вид сообщений в чате"
+        }
+      ]
     },
     {
       "id": "5",
