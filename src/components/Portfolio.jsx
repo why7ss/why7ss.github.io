@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Search, X } from 'lucide-react'
 import ProjectCard from './ProjectCard.jsx'
+import ProjectModal from './ProjectModal.jsx'
 
 const FILTERS = [
   { key: 'all', label: 'Все' },
@@ -13,6 +14,7 @@ const FILTERS = [
 export default function Portfolio({ projects }) {
   const [activeFilter, setActiveFilter] = useState('all')
   const [query, setQuery] = useState('')
+  const [selectedProject, setSelectedProject] = useState(null)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -92,7 +94,12 @@ export default function Portfolio({ projects }) {
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((project, i) => (
-              <ProjectCard key={project.id} project={project} wide={i % 5 === 0} />
+              <ProjectCard
+                key={project.id}
+                project={project}
+                wide={i % 5 === 0}
+                onClick={() => setSelectedProject(project)}
+              />
             ))}
           </AnimatePresence>
         </motion.div>
@@ -103,6 +110,14 @@ export default function Portfolio({ projects }) {
           </div>
         )}
       </div>
+
+      {/* Окно детального просмотра */}
+      {selectedProject && (
+        <ProjectModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
+      )}
     </section>
   )
 }

@@ -12,7 +12,7 @@
       { "label": "Telegram", "url": "https://t.me/why7ss", "icon": "telegram" },
       { "label": "Email", "url": "mailto:why7ss7why@gmail.com", "icon": "mail" }
     ]
-  },
+  },  
   "skills": [
     {
       "id": "core-java",
@@ -36,9 +36,9 @@
       "size": "sm"
     },
     {
-      "id": "mysql-redis",
-      "title": "MySQL / Redis",
-      "description": "Схемы данных под высокую нагрузку, кэширование, синхронизация между нодами.",
+      "id": "resource-pack",
+      "title": "ResourcePack",
+      "description": "Работа с API: Nexo, Oraxen, ItemsAdder, ModelEngine. Создание кастомных моделей, текстур и анимаций.",
       "icon": "Database",
       "size": "sm"
     },
@@ -80,13 +80,37 @@
       "status": "closed",
       "githubUrl": "",
       "tags": ["Java", "Paper API", "PacketEvents", "Anti-Cheat"],
-      "image": "./images/proj-1.svg"
+      "image": "./images/proj-1.svg",
+      "content": [
+        {
+          "type": "heading",
+          "value": "Основной функционал"
+        },
+        {
+          "type": "text",
+          "value": "Запускается игра, всех игроков телепортирует кругом на арену. Арена динамически меняется в зависимости от количества игроков, модификаторов и тд. Присутствует около 30 различных модификаторов, и в одном режиме может быть от 0 до 5. Модификаторы могут конкретно менять режим: менять арену, работать с предметами, изменять логику игры и тд."
+        },
+        {
+          "type": "image",
+          "url": "./videos/maceroulettegameplay.mp4",
+          "caption": "Пример игры"
+        },
+        {
+          "type": "text",
+          "value": "Так же присутствуют достижения, небольшой античит от clip'ов, ежедневные задания, тренировки на ботах, 3D-эффекты убийств (ModelEngine) и скины на булаву (Nexo). Весь функционал работает на кастомной архитектуре, которая позволяет легко добавлять новые режимы, модификаторы и предметы."
+        },
+        {
+          "type": "gif",
+          "url": "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjEx.../giphy.gif",
+          "caption": "Демонстрация работы мини-античита в реальном времени"
+        }
+      ]
     },
     {
       "id": "2",
       "title": "DarkAPI",
       "type": "plugin",
-      "description": "Приватный служебный фреймворк для ускорения разработки: содержит обёртки для работы с MiniMessage, утилиты парсинга компонентов и хелперы для сокращения boilerplate-кода.",
+      "description": "Приватный служебный API для ускорения разработки: содержит обёртки для работы с MiniMessage, утилиты парсинга компонентов и хелперы для сокращения boilerplate-кода.",
       "status": "open",
       "githubUrl": "https://github.com/why7ss/DarkAPI",
       "tags": ["Java", "Paper API", "MiniMessage", "Adventure API"],
