@@ -149,23 +149,45 @@ export default function ProjectModal({ project, onClose }) {
 
                     // Картинка или Гифка
                     if (block.type === 'image' || block.type === 'gif') {
-                      return (
+                        return (
                         <figure key={index} className="space-y-2 my-4">
-                          <div className="overflow-hidden border border-line bg-surface2">
+                            <div className="overflow-hidden border border-line bg-surface2">
                             <img
-                              src={block.url}
-                              alt={block.caption || ''}
-                              loading="lazy"
-                              className="w-full h-auto object-cover max-h-[500px]"
+                                src={block.url}
+                                alt={block.caption || ''}
+                                loading="lazy"
+                                className="w-full h-auto object-cover max-h-[500px]"
                             />
-                          </div>
-                          {block.caption && (
+                            </div>
+                            {block.caption && (
                             <figcaption className="text-center text-xs font-mono text-muted">
-                              — {block.caption}
+                                — {block.caption}
                             </figcaption>
-                          )}
+                            )}
                         </figure>
-                      )
+                        )
+                    }
+
+                    // Видео (.mp4, .webm)
+                    if (block.type === 'video') {
+                        return (
+                        <figure key={index} className="space-y-2 my-4">
+                            <div className="overflow-hidden border border-line bg-surface2">
+                            <video
+                                src={block.url}
+                                controls
+                                playsInline
+                                preload="metadata"
+                                className="w-full h-auto max-h-[500px] object-cover"
+                            />
+                            </div>
+                            {block.caption && (
+                            <figcaption className="text-center text-xs font-mono text-muted">
+                                — {block.caption}
+                            </figcaption>
+                            )}
+                        </figure>
+                        )
                     }
 
                     return null
