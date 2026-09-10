@@ -123,16 +123,20 @@ export default function ProjectModal({ project, onClose }) {
               {project.content && project.content.length > 0 && (
                 <div className="space-y-6 pt-2">
                   {project.content.map((block, index) => {
-                    // Заголовок секции
+                    // Заголовок секции (Heading)
                     if (block.type === 'heading') {
-                      return (
-                        <h4
-                          key={index}
-                          className="font-display text-xl md:text-2xl text-ink font-semibold pt-4 border-t border-line/40 first:border-none first:pt-0"
-                        >
-                          {block.value}
-                        </h4>
-                      )
+                        return (
+                            <div key={index} className="pt-6 pb-2 border-t border-line/40 first:border-none first:pt-0">
+                            <div className="flex items-center gap-3">
+                                {/* Маленький технический индикатор/символ */}
+                                <span className="font-mono text-sm text-accent font-bold select-none">//</span>
+                                
+                                <h4 className="text-xl md:text-2xl text-ink font-semibold tracking-tight">
+                                {block.value}
+                                </h4>
+                            </div>
+                            </div>
+                        )
                     }
 
                     // Текст
