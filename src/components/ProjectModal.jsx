@@ -157,14 +157,16 @@ export default function ProjectModal({ project, onClose }) {
                         )
                       }
 
-                      // Text
-                      if (block.type === 'text') {
+                        if (block.type === 'text') {
                         return (
-                          <p key={index} className="text-sm md:text-base leading-relaxed text-muted/90 whitespace-pre-line font-normal">
+                            <p
+                            key={index}
+                            className="text-base leading-relaxed text-muted/90 whitespace-pre-line"
+                            >
                             {block.value}
-                          </p>
+                            </p>
                         )
-                      }
+                        }
 
                       // Image / GIF
                       if (block.type === 'image' || block.type === 'gif') {
