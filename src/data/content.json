@@ -122,8 +122,87 @@
       "description": "Кастомная сборка сервера, полная воссозданная копия плейса «Steal a Brainrot» из Roblox. Включает уникальную архитектуру, настроенную механику воровства и кастомные 3D-модели итальянских бреинротов.",
       "status": "closed",
       "githubUrl": "",
-      "tags": ["Java", "Paper API", "DH API", "Model Engine"],
-      "image": "./images/proj-3.svg"
+      "tags": ["Java", "Paper API", "DH API", "Model Engine", "Citizens API"],
+      "image": "./images/proj-3.svg",
+      "content": [
+        {
+          "type": "heading",
+          "value": "Основные механики"
+        },
+        {
+          "type": "text",
+          "value": "Воровство бреинротов, отдельные независимые лобби (10) с лимитом игроков (10), кастомные 3D-модели с анимациями, механика закрытия дверей и добавления в друзья игроков, 3 кастомных предмета, система перерождений, ивенты. Каждый бреинрот имеет свою редкость, стоимость, модификатор, хитбокс."
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image.png",
+          "caption": "Кастомные хитбоксы у бреинротов"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (1).png",
+          "caption": "Таб, скорборд"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (2).png",
+          "caption": "Закрытие дверей у базы"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (3).png",
+          "caption": "Кастомные 3D-модели бреинротов с анимациями, голограммы, цены бреинротов"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (4).png",
+          "caption": "Магазин кастомных предметов"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (5).png",
+          "caption": "Меню перерождения"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (6).png",
+          "caption": "Баланс бреинрота"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (7).png",
+          "caption": "Смена языка"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (8).png",
+          "caption": "Кастомные 3D-модели мечей для каждого уровня перерождения"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (9).png",
+          "caption": "Основной вид базы при заходе в лобби"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (10).png",
+          "caption": "Выбор лобби"
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (11).png",
+          "caption": "Путеводитель с плавными анимациями, плавным писанием в чате. Реализован через Typewriter."
+        },
+        {
+          "type": "image",
+          "url": "./images/brainrots/image (12).png",
+          "caption": "Вид хаба с стороны"
+        },
+        {
+          "type": "text",
+          "value": "Весь режим был воссоздан с нуля, от заказчика была предоставлена лишь карта и скорборд."
+        }
+      ]
     },
     {
       "id": "4",
